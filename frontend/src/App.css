@@ -1,42 +1,91 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  font-family: "Arial", sans-serif;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background-color: #fff8e1;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.chat-container {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  width: 100%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.message-row {
+  display: flex;
 }
 
-.card {
-  padding: 2em;
+.message-row.left {
+  justify-content: flex-start;
 }
 
-.read-the-docs {
-  color: #888;
+.message-row.right {
+  justify-content: flex-end;
+}
+
+.message-bubble {
+  padding: 16px 20px;
+  border-radius: 20px;
+  max-width: 70%;
+  font-size: 1.3rem;
+  line-height: 1.8em;
+  word-break: break-word;
+}
+
+.message-bubble.user {
+  background-color: #ffe082;
+  color: #333;
+}
+
+.message-bubble.ai {
+  background-color: #90caf9;
+  color: #000;
+  font-weight: bold;
+}
+
+.play-button {
+  margin-left: 10px;
+  padding: 4px 8px;
+  font-size: 0.9rem;
+  background-color: #42a5f5;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.input-container {
+  display: flex;
+  padding: 12px 20px;
+  border-top: 1px solid #ffd54f;
+  background-color: #fff3e0;
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: center;
+}
+
+.input-container button {
+  background-color: #ffb74d;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 1.2rem;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.input-container button.recording {
+  background-color: #f06292; /* 錄音中顏色變粉紅 */
 }
