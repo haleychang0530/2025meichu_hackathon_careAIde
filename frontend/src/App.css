@@ -33,12 +33,13 @@ html, body, #root {
 
 .message-row.right {
   justify-content: flex-end;
+  padding-right: 40px; /* 增加右側內邊距 */
 }
 
 .message-bubble {
   padding: 16px 20px;
   border-radius: 20px;
-  max-width: 70%;
+  max-width: 60%;
   font-size: 1.3rem;
   line-height: 1.8em;
   word-break: break-word;
