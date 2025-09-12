@@ -6,6 +6,7 @@ export default function App() {
     { type: "ai", text: "你好，我是你的技術助手 😊" },
   ]);
   const [listening, setListening] = useState(false);
+  const [inputText, setInputText] = useState(""); // 新增狀態來儲存輸入框的文字
   const recognitionRef = useRef(null);
 
   const handleSend = async (text) => {
@@ -64,6 +65,12 @@ export default function App() {
     }
   };
 
+  // 處理輸入框的文字發送
+  const handleInputSend = () => {
+    handleSend(inputText); // 發送輸入框的文字
+    setInputText(""); // 清空輸入框
+  };
+
   return (
     <div className="app-container">
       <div className="chat-container">
@@ -91,11 +98,19 @@ export default function App() {
       </div>
 
       <div className="input-container">
+        <input
+          type="text"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)} // 更新輸入框的文字
+          placeholder="輸入訊息..."
+          className="text-input"
+        />
+        <button onClick={handleInputSend}>傳送文字</button>
         <button
           onClick={handleVoiceInput}
           className={listening ? "recording" : ""}
         >
-          🗨️ 開始對話
+          🗨️ 開始錄音
         </button>
       </div>
     </div>

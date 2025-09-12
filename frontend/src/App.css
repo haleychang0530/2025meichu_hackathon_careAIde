@@ -46,12 +46,12 @@ html, body, #root {
 }
 
 .message-bubble.user {
-  background-color: #ffe082;
+  background-color: #d79392;
   color: #333;
 }
 
 .message-bubble.ai {
-  background-color: #90caf9;
+  background-color: #88bb35;
   color: #000;
   font-weight: bold;
 }
@@ -60,7 +60,7 @@ html, body, #root {
   margin-left: 10px;
   padding: 4px 8px;
   font-size: 0.9rem;
-  background-color: #42a5f5;
+  background-color: #84a84a;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -75,10 +75,11 @@ html, body, #root {
   width: 100%;
   box-sizing: border-box;
   justify-content: center;
+  align-items: center; /* 垂直居中對齊 */
 }
 
 .input-container button {
-  background-color: #ffb74d;
+  background-color: #ce7633;
   color: white;
   border: none;
   padding: 12px 20px;
@@ -88,5 +89,15 @@ html, body, #root {
 }
 
 .input-container button.recording {
-  background-color: #f06292; /* 錄音中顏色變粉紅 */
+  background-color: #d79392; /* 錄音中顏色變粉紅 */
+}
+
+.text-input {
+  flex: 1; /* 讓輸入框填滿剩餘空間 */
+  padding: 12px 20px; /* 增加內邊距 */
+  font-size: 1.2rem; /* 調整字體大小 */
+  border: 1px solid #ccc; /* 添加邊框 */
+  border-radius: 15px; /* 圓角邊框 */
+  margin-right: 10px; /* 與按鈕保持間距 */
+  box-sizing: border-box; /* 包含內邊距在寬度內 */
 }
