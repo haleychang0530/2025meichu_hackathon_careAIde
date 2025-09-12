@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
 html, body, #root {
   height: 100%;
   width: 100%;
@@ -56,7 +57,13 @@ html, body, #root {
   font-weight: bold;
 }
 
-.play-button {
+.voice-buttons {
+  display: flex;
+  gap: 10px; /* 播放和停止按鈕之間的間距 */
+}
+
+.play-button,
+.stop-button {
   margin-left: 10px;
   padding: 4px 8px;
   font-size: 0.9rem;
@@ -65,6 +72,15 @@ html, body, #root {
   border: none;
   border-radius: 10px;
   cursor: pointer;
+}
+
+.stop-button {
+  background-color: #d9534f; /* 停止按鈕的紅色背景 */
+}
+
+.play-button:hover,
+.stop-button:hover {
+  opacity: 0.8; /* 滑鼠懸停時的透明效果 */
 }
 
 .input-container {
@@ -79,13 +95,14 @@ html, body, #root {
 }
 
 .input-container button {
-  background-color: #ce7633;
+  background-color: #c28c17;
   color: white;
   border: none;
   padding: 12px 20px;
   font-size: 1.2rem;
   border-radius: 15px;
   cursor: pointer;
+  margin-left: 10px;
 }
 
 .input-container button.recording {
@@ -100,4 +117,27 @@ html, body, #root {
   border-radius: 15px; /* 圓角邊框 */
   margin-right: 10px; /* 與按鈕保持間距 */
   box-sizing: border-box; /* 包含內邊距在寬度內 */
+}
+
+.logo-container {
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: 'Nunito', sans-serif; /* 使用 Nunito 字體 */
+  font-size: 2rem;
+  color: #F5A623; /* Care 和 de 的顏色 */
+  opacity: 1; /* 初始完全可見 */
+  transition: opacity 1s ease-out; /* 漸隱效果 */
+}
+
+.logo-container.fade-out {
+  opacity: 0; /* 漸隱 */
+  height: 0; /* 高度設為 0 */
+  margin-bottom: 0; /* 移除下方間距 */
+  overflow: hidden; /* 隱藏內容 */
+  opacity: 0; /* 漸隱 */
+  pointer-events: none; /* 防止漸隱後仍可點擊 */
+}
+
+.logo-container .highlight-ai {
+  color: #29ab29; /* AI 的顏色 */
 }

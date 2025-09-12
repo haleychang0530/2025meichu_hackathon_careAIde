@@ -1,16 +1,33 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./App.css";
 
 export default function App() {
-  const [messages, setMessages] = useState([
-    { type: "ai", text: "你好，我是你的技術助手 😊" },
-  ]);
+  const [messages, setMessages] = useState([]); // 初始訊息不包含 AI 的第一句話
   const [listening, setListening] = useState(false);
-  const [inputText, setInputText] = useState(""); // 新增狀態來儲存輸入框的文字
+  const [inputText, setInputText] = useState(""); // 儲存輸入框的文字
+  const [showLogo, setShowLogo] = useState(true); // 控制 Logo 是否顯示
+  const chatContainerRef = useRef(null); // 用於滾動到底部
   const recognitionRef = useRef(null);
+
+  // 滾動到底部的函數
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  };
+
+  // 當訊息更新時，自動滾動到底部
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSend = async (text) => {
     if (!text.trim()) return;
+
+    // 如果是第一則訊息，觸發 Logo 漸隱效果
+    if (messages.length === 0) {
+      setShowLogo(false);
+    }
 
     // 加入使用者訊息
     setMessages((prev) => [...prev, { type: "user", text }]);
@@ -32,7 +49,6 @@ export default function App() {
     }
   };
 
-  // 語音錄入
   const handleVoiceInput = () => {
     if (!("webkitSpeechRecognition" in window)) {
       alert("你的瀏覽器不支援語音辨識");
@@ -65,32 +81,61 @@ export default function App() {
     }
   };
 
-  // 處理輸入框的文字發送
   const handleInputSend = () => {
     handleSend(inputText); // 發送輸入框的文字
     setInputText(""); // 清空輸入框
   };
 
+  const playVoice = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "zh-TW"; // 設定語言為繁體中文
+    speechSynthesis.speak(utterance);
+  };
+
+  const stopVoice = () => {
+    speechSynthesis.cancel(); // 停止語音播放
+  };
+
   return (
     <div className="app-container">
-      <div className="chat-container">
+      {/* CareAIde Logo */}
+      <div className={`logo-container ${!showLogo ? "fade-out" : ""}`}>
+        <h1>
+          Care<span className="highlight-ai">AI</span>de
+        </h1>
+      </div>
+
+      <div className="chat-container" ref={chatContainerRef}>
+        {/* AI 預設的第一句話 */}
+        <div className="message-row left">
+          <div className="message-bubble ai">
+            你好，我是你的技術助手 😊
+          </div>
+        </div>
+
+        {/* 動態訊息 */}
         {messages.map((msg, idx) => (
           <div
             key={idx}
-            className={`message-row ${msg.type === "user" ? "left" : "right"}`}
+            className={`message-row ${msg.type === "user" ? "right" : "left"}`}
           >
             <div className={`message-bubble ${msg.type}`}>
               {msg.text}
               {msg.type === "ai" && (
-                <button
-                  className="play-button"
-                  onClick={() => {
-                    const utter = new SpeechSynthesisUtterance(msg.text);
-                    speechSynthesis.speak(utter);
-                  }}
-                >
-                  🔊
-                </button>
+                <div className="voice-buttons">
+                  <button
+                    className="play-button"
+                    onClick={() => playVoice(msg.text)}
+                  >
+                    🔊 播放
+                  </button>
+                  <button
+                    className="stop-button"
+                    onClick={stopVoice}
+                  >
+                    ⏹ 停止
+                  </button>
+                </div>
               )}
             </div>
           </div>
