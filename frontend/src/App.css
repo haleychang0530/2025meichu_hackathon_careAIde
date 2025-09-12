@@ -41,13 +41,13 @@ html, body, #root {
   padding: 16px 20px;
   border-radius: 20px;
   max-width: 60%;
-  font-size: 1.3rem;
+  font-size: 1.8rem;
   line-height: 1.8em;
   word-break: break-word;
 }
 
 .message-bubble.user {
-  background-color: #d79392;
+  background-color: #F5A623;
   color: #333;
 }
 
@@ -75,7 +75,7 @@ html, body, #root {
 }
 
 .stop-button {
-  background-color: #d9534f; /* 停止按鈕的紅色背景 */
+  background-color: #d9534f; 
 }
 
 .play-button:hover,
@@ -99,20 +99,20 @@ html, body, #root {
   color: white;
   border: none;
   padding: 12px 20px;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   border-radius: 15px;
   cursor: pointer;
   margin-left: 10px;
 }
 
 .input-container button.recording {
-  background-color: #d79392; /* 錄音中顏色變粉紅 */
+  background-color: #F5A623; /* 錄音中顏色 new */
 }
 
 .text-input {
   flex: 1; /* 讓輸入框填滿剩餘空間 */
   padding: 12px 20px; /* 增加內邊距 */
-  font-size: 1.2rem; /* 調整字體大小 */
+  font-size: 1.5rem; /* 調整字體大小 */
   border: 1px solid #ccc; /* 添加邊框 */
   border-radius: 15px; /* 圓角邊框 */
   margin-right: 10px; /* 與按鈕保持間距 */

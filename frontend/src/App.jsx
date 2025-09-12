@@ -155,7 +155,7 @@ export default function App() {
           onClick={handleVoiceInput}
           className={listening ? "recording" : ""}
         >
-          🗨️ 開始錄音
+          開始錄音
         </button>
       </div>
     </div>
