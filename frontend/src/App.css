@@ -1,4 +1,7 @@
+/* 引入 Google Fonts - Nunito 字體 */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+/* 全域設定：重置頁面樣式並設定基本字體 */
 html, body, #root {
   height: 100%;
   width: 100%;
@@ -6,138 +9,303 @@ html, body, #root {
   font-family: "Arial", sans-serif;
 }
 
+/* 主應用容器：設定為全螢幕的垂直布局 */
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100vh;
   width: 100%;
-  background-color: #fff8e1;
+  background-color: #fff8e1; /* 溫暖的米黃色背景 */
+  position: relative; /* 用於定位齒輪圖標和設定面板 */
 }
 
+/* 聊天區域容器：可滾動的主要對話區域 */
 .chat-container {
-  flex: 1;
+  flex: 1; /* 佔據剩餘空間 */
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
+  gap: 20px; /* 訊息間的間距 */
+  overflow-y: auto; /* 允許垂直滾動 */
   width: 100%;
 }
 
+/* 訊息行容器：控制訊息的對齊方式 */
 .message-row {
   display: flex;
 }
 
+/* AI 訊息：靠左對齊 */
 .message-row.left {
   justify-content: flex-start;
 }
 
+/* 使用者訊息：靠右對齊 */
 .message-row.right {
   justify-content: flex-end;
   padding-right: 40px; /* 增加右側內邊距 */
 }
 
+/* 訊息氣泡：基本樣式 */
 .message-bubble {
   padding: 16px 20px;
-  border-radius: 20px;
-  max-width: 60%;
-  font-size: 1.8rem;
+  border-radius: 20px; /* 圓角氣泡效果 */
+  max-width: 60%; /* 限制最大寬度避免過寬 */
+  font-size: 1.8rem; /* 老人友善的大字體 */
   line-height: 1.8em;
-  word-break: break-word;
+  word-break: break-word; /* 長單字自動換行 */
 }
 
+/* 使用者訊息氣泡：橙色主題 */
 .message-bubble.user {
   background-color: #F5A623;
   color: #333;
 }
 
+/* AI 訊息氣泡：綠色主題 */
 .message-bubble.ai {
   background-color: #88bb35;
   color: #000;
   font-weight: bold;
 }
 
+/* 語音控制按鈕容器 */
 .voice-buttons {
   display: flex;
   gap: 10px; /* 播放和停止按鈕之間的間距 */
+  margin-top: 10px;
 }
 
+/* 語音播放和停止按鈕樣式 */
 .play-button,
 .stop-button {
-  margin-left: 10px;
   padding: 4px 8px;
   font-size: 0.9rem;
-  background-color: #84a84a;
+  background-color: #84a84a; /* 默認綠色 */
   color: #fff;
   border: none;
   border-radius: 10px;
   cursor: pointer;
 }
 
+/* 停止按鈕：紅色主題 */
 .stop-button {
   background-color: #d9534f; 
 }
 
+/* 語音按鈕懸停效果 */
 .play-button:hover,
 .stop-button:hover {
-  opacity: 0.8; /* 滑鼠懸停時的透明效果 */
+  opacity: 0.8;
 }
 
+/* 輸入區域容器：底部固定的輸入欄 */
 .input-container {
   display: flex;
   padding: 12px 20px;
-  border-top: 1px solid #ffd54f;
-  background-color: #fff3e0;
+  border-top: 1px solid #ffd54f; /* 分隔線 */
+  background-color: #fff3e0; /* 淺橙色背景 */
   width: 100%;
   box-sizing: border-box;
   justify-content: center;
   align-items: center; /* 垂直居中對齊 */
 }
 
+/* 輸入區域按鈕樣式 */
 .input-container button {
-  background-color: #c28c17;
+  background-color: #c28c17; /* 橙棕色 */
   color: white;
   border: none;
   padding: 12px 20px;
-  font-size: 1.5rem;
+  font-size: 1.5rem; /* 老人友善的大字體 */
   border-radius: 15px;
   cursor: pointer;
   margin-left: 10px;
 }
 
+/* 錄音中的按鈕狀態 */
 .input-container button.recording {
-  background-color: #F5A623; /* 錄音中顏色 new */
+  background-color: #F5A623; /* 錄音時變為亮橙色 */
 }
 
+/* 文字輸入框樣式 */
 .text-input {
-  flex: 1; /* 讓輸入框填滿剩餘空間 */
-  padding: 12px 20px; /* 增加內邊距 */
-  font-size: 1.5rem; /* 調整字體大小 */
-  border: 1px solid #ccc; /* 添加邊框 */
-  border-radius: 15px; /* 圓角邊框 */
-  margin-right: 10px; /* 與按鈕保持間距 */
-  box-sizing: border-box; /* 包含內邊距在寬度內 */
+  flex: 1; /* 佔據剩餘空間 */
+  padding: 12px 20px;
+  font-size: 1.5rem; /* 老人友善的大字體 */
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  margin-right: 10px;
+  box-sizing: border-box;
 }
 
+/* Logo 容器：應用標題區域 */
 .logo-container {
   text-align: center;
   margin-bottom: 20px;
   font-family: 'Nunito', sans-serif; /* 使用 Nunito 字體 */
   font-size: 2rem;
-  color: #F5A623; /* Care 和 de 的顏色 */
-  opacity: 1; /* 初始完全可見 */
-  transition: opacity 1s ease-out; /* 漸隱效果 */
+  color: #F5A623; /* Care 和 de 的橙色 */
+  opacity: 1;
+  transition: opacity 1s ease-out; /* 漸隱動畫 */
 }
 
+/* Logo 漸隱效果：第一條訊息後觸發 */
 .logo-container.fade-out {
-  opacity: 0; /* 漸隱 */
-  height: 0; /* 高度設為 0 */
-  margin-bottom: 0; /* 移除下方間距 */
+  opacity: 0; /* 透明 */
+  height: 0; /* 高度歸零 */
+  margin-bottom: 0; /* 移除下邊距 */
   overflow: hidden; /* 隱藏內容 */
-  opacity: 0; /* 漸隱 */
-  pointer-events: none; /* 防止漸隱後仍可點擊 */
+  pointer-events: none; /* 禁用滑鼠事件 */
 }
 
+/* Logo 中的 AI 文字：綠色強調 */
 .logo-container .highlight-ai {
-  color: #29ab29; /* AI 的顏色 */
+  color: #29ab29;
+}
+
+/* 設定齒輪圖標：右上角固定位置 */
+.settings-icon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 1000; /* 確保在最上層 */
+  padding: 10px;
+  border-radius: 50%; /* 圓形背景 */
+  background-color: rgba(255, 255, 255, 0.8); /* 半透明白色背景 */
+  transition: background-color 0.3s ease;
+}
+
+/* 齒輪圖標懸停效果 */
+.settings-icon:hover {
+  background-color: rgba(255, 255, 255, 1); /* 完全不透明 */
+}
+
+/* 設定面板：下拉式設定選單 */
+.settings-panel {
+  position: absolute;
+  top: 60px; /* 位於齒輪圖標下方 */
+  right: 20px;
+  width: 320px; /* 稍微加寬以容納 Demo 模式 */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 陰影效果 */
+  z-index: 999;
+}
+
+/* 設定面板標題 */
+.settings-panel h3 {
+  margin: 0 0 15px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+/* Demo 模式區域 */
+.demo-mode {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f0f8ff; /* 淡藍色背景突出 Demo 模式 */
+  border-radius: 8px;
+  border: 2px dashed #4a90e2; /* 虛線邊框表示這是特殊模式 */
+}
+
+.demo-mode label {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.demo-mode input[type="checkbox"] {
+  margin-right: 8px;
+  transform: scale(1.2); /* 放大核取方塊 */
+}
+
+/* 語音輸出設定區域 */
+.voice-output {
+  margin-bottom: 0; /* 移除底部間距，因為現在它在最下方 */
+}
+
+/* 設定面板內的標籤文字 */
+.voice-output label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* 語音語言選擇的膠囊按鈕容器 */
+.voice-toggle {
+  display: flex;
+  border-radius: 25px; /* 膠囊形狀 */
+  overflow: hidden;
+  border: 2px solid #29ab29; /* 綠色邊框 */
+}
+
+/* 膠囊按鈕樣式 */
+.toggle-btn {
+  flex: 1; /* 平均分配空間 */
+  padding: 10px 20px;
+  border: none;
+  background-color: #f8f8f8; /* 未選中時的淺灰色 */
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease; /* 平滑過渡效果 */
+  font-size: 1rem;
+}
+
+/* 選中狀態的膠囊按鈕 */
+.toggle-btn.active {
+  background-color: #29ab29; /* 綠色背景 */
+  color: white;
+}
+
+/* 未選中按鈕的懸停效果 */
+.toggle-btn:hover:not(.active) {
+  background-color: #e8e8e8;
+}
+
+/* Gmail 輸入區域容器 */
+.email-input {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+/* Gmail 區域的標籤 */
+.email-input label {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Gmail 輸入框 */
+.email-input input {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+/* Gmail 提交按鈕 */
+.email-input button {
+  padding: 10px;
+  background-color: #29ab29; /* 綠色主題 */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+/* Gmail 按鈕懸停效果 */
+.email-input button:hover {
+  background-color: #218c21; /* 深一點的綠色 */
 }
