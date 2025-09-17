@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import "./App.css";
 
@@ -11,6 +10,7 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false); // 控制設定面板顯示
   const [voiceLanguage, setVoiceLanguage] = useState("chinese"); // 語音輸出語言選擇
   const [demoMode, setDemoMode] = useState(false); // Demo 模式開關
+  const [isAiThinking, setIsAiThinking] = useState(false); // 新增：AI思考狀態
   const chatContainerRef = useRef(null); // 用於滾動到底部
   const recognitionRef = useRef(null);
   const settingsTimerRef = useRef(null); // 用於儲存設定面板自動關閉的計時器
@@ -25,7 +25,7 @@ export default function App() {
   // 當訊息更新時，自動滾動到底部
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isAiThinking]); // 新增isAiThinking依賴，讓加載動畫出現時也滾動
 
   // 清理計時器的副作用
   useEffect(() => {
@@ -47,6 +47,9 @@ export default function App() {
     // 加入使用者訊息
     setMessages((prev) => [...prev, { type: "user", text }]);
 
+    // AI思考狀態
+    setIsAiThinking(true);
+
     // 呼叫假後端
     try {
       const response = await fetch("http://localhost:5000/ai", {
@@ -55,8 +58,13 @@ export default function App() {
         body: JSON.stringify({ message: text }),
       });
       const data = await response.json();
+      
+      // 結束AI思考狀態並加入AI回覆
+      setIsAiThinking(false);
       setMessages((prev) => [...prev, { type: "ai", text: data.reply }]);
     } catch (err) {
+      // 發生錯誤時也要結束思考狀態
+      setIsAiThinking(false);
       setMessages((prev) => [
         ...prev,
         { type: "ai", text: "抱歉，我暫時無法回覆 😢" },
@@ -286,6 +294,18 @@ export default function App() {
             </div>
           </div>
         ))}
+
+        {/* AI思考中的加載動畫 */}
+        {isAiThinking && (
+          <div className="message-row left">
+            <div className="message-bubble ai thinking">
+              <div className="thinking-indicator">
+                <div className="spinner"></div>
+                <span className="thinking-text">思考中...</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="input-container">
@@ -296,15 +316,22 @@ export default function App() {
           onKeyPress={(e) => e.key === 'Enter' && handleInputSend()} // 按 Enter 發送
           placeholder="輸入訊息..."
           className="text-input"
+          disabled={isAiThinking} // AI思考時禁用輸入
         />
-        <button onClick={handleInputSend}>傳送文字</button>
+        <button 
+          onClick={handleInputSend}
+          disabled={isAiThinking} // AI思考時禁用按鈕
+        >
+          傳送文字
+        </button>
         <button
           onClick={handleVoiceInput}
           className={listening ? "recording" : ""}
+          disabled={isAiThinking} // AI思考時禁用語音輸入
         >
           開始錄音
         </button>
       </div>
     </div>
   );
-} 
+}
