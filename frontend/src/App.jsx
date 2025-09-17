@@ -15,6 +15,57 @@ export default function App() {
   const recognitionRef = useRef(null);
   const settingsTimerRef = useRef(null); // 用於儲存設定面板自動關閉的計時器
 
+  // 簡單的 Markdown 解析函數
+  const parseMarkdown = (text) => {
+    // 處理粗體 **text** 或 __text__
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
+    
+    // 處理斜體 *text* 或 _text_
+    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    text = text.replace(/_(.*?)_/g, '<em>$1</em>');
+    
+    // 處理程式碼區塊 ```code```
+    text = text.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    
+    // 處理行內程式碼 `code`
+    text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // 處理標題 # ## ###
+    text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+    text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+    text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+    
+    // 處理連結 [text](url)
+    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    
+    // 處理換行
+    text = text.replace(/\n/g, '<br>');
+    
+    // 處理無序列表 - item 或 * item
+    text = text.replace(/^[\s]*[-*]\s(.*)$/gim, '<li>$1</li>');
+    text = text.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+    
+    // 處理有序列表 1. item
+    text = text.replace(/^[\s]*\d+\.\s(.*)$/gim, '<li>$1</li>');
+    
+    return text;
+  };
+
+  // 渲染訊息內容的組件
+  const MessageContent = ({ text, type }) => {
+    if (type === 'ai') {
+      return (
+        <div 
+          dangerouslySetInnerHTML={{ 
+            __html: parseMarkdown(text) 
+          }} 
+        />
+      );
+    }
+    return <span>{text}</span>;
+  };
+
   // 滾動到底部的函數
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
@@ -36,6 +87,63 @@ export default function App() {
     };
   }, []);
 
+  // 測試用的 Markdown 回覆
+  const getTestMarkdownReply = (userMessage) => {
+    const testReplies = [
+      `這是一個包含 **粗體文字** 和 *斜體文字* 的回覆。
+
+# 主標題
+## 副標題
+### 小標題
+
+這裡有一些程式碼：\`console.log("Hello World")\`
+
+以及程式碼區塊：
+\`\`\`javascript
+function greet(name) {
+  return "Hello, " + name + "!";
+}
+\`\`\`
+
+還有一個連結：[Google](https://www.google.com)
+
+以及列表：
+- 項目一
+- 項目二
+- 項目三`,
+
+      `我可以幫你解決技術問題！這裡是一些常見的解決方案：
+
+## 常見問題解決步驟
+
+1. **檢查網路連線**
+2. *重新啟動裝置*
+3. 清除快取資料
+
+\`\`\`bash
+# 清除快取的指令
+rm -rf ~/.cache
+\`\`\`
+
+更多資訊請參考：[技術支援文件](https://example.com)`,
+
+      `**解答：** 根據您的問題，我建議您：
+
+### 步驟一：基本檢查
+- 確認 \`設定\` 是否正確
+- 檢查 **系統狀態**
+
+### 步驟二：進階處理
+\`\`\`
+sudo systemctl restart service
+\`\`\`
+
+*希望這個回答對您有幫助！*`
+    ];
+    
+    return testReplies[Math.floor(Math.random() * testReplies.length)];
+  };
+
   const handleSend = async (text) => {
     if (!text.trim()) return;
 
@@ -49,6 +157,18 @@ export default function App() {
 
     // AI思考狀態
     setIsAiThinking(true);
+
+    // 測試模式：如果輸入包含 "markdown" 或 "測試"，回傳測試 markdown
+    if (demoMode || text.toLowerCase().includes('markdown') || text.includes('測試')) {
+      setTimeout(() => {
+        setIsAiThinking(false);
+        setMessages((prev) => [...prev, { 
+          type: "ai", 
+          text: getTestMarkdownReply(text)
+        }]);
+      }, 1500); // 模擬思考時間
+      return;
+    }
 
     // 呼叫假後端
     try {
@@ -110,7 +230,9 @@ export default function App() {
   };
 
   const playVoice = (text) => {
-    const utterance = new SpeechSynthesisUtterance(text);
+    // 移除 HTML 標籤，只讀純文字
+    const cleanText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    const utterance = new SpeechSynthesisUtterance(cleanText);
     
     // 根據選擇的語言設定
     if (voiceLanguage === "chinese") {
@@ -274,7 +396,7 @@ export default function App() {
             className={`message-row ${msg.type === "user" ? "right" : "left"}`}
           >
             <div className={`message-bubble ${msg.type}`}>
-              {msg.text}
+              <MessageContent text={msg.text} type={msg.type} />
               {msg.type === "ai" && (
                 <div className="voice-buttons">
                   <button

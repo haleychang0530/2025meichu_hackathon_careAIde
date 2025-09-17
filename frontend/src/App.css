@@ -394,3 +394,33 @@ html, body, #root {
     max-width: 80%;
   }
 }
+
+.message-bubble.ai h1, .message-bubble.ai h2, .message-bubble.ai h3 {
+  margin: 0.5em 0;
+  color: inherit;
+}
+
+.message-bubble.ai code {
+  background-color: rgba(0,0,0,0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+.message-bubble.ai pre {
+  background-color: rgba(0,0,0,0.1);
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.message-bubble.ai ul, .message-bubble.ai ol {
+  padding-left: 20px;
+  margin: 10px 0;
+}
+
+.message-bubble.ai a {
+  color: #0066cc;
+  text-decoration: underline;
+}
