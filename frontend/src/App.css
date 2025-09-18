@@ -78,9 +78,10 @@ html, body, #root {
 
 /* 語音播放和停止按鈕樣式 */
 .play-button,
-.stop-button {
+.stop-button,
+.expand-steps-btn {
   padding: 4px 8px;
-  font-size: 0.9rem;
+  font-size: 1.9rem;
   background-color: #84a84a; /* 默認綠色 */
   color: #fff;
   border: none;
@@ -91,6 +92,10 @@ html, body, #root {
 /* 停止按鈕：紅色主題 */
 .stop-button {
   background-color: #d9534f; 
+}
+
+.expand-steps-btn{
+  background-color:#4CAF50;;
 }
 
 /* 語音按鈕懸停效果 */
@@ -423,4 +428,224 @@ html, body, #root {
 .message-bubble.ai a {
   color: #0066cc;
   text-decoration: underline;
+}
+
+/* 技術支援相關樣式 */
+.tech-support-prompt {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e0e0e0;
+}
+
+/*.expand-steps-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 28px;
+  transition: background-color 0.3s;
+} */
+
+.expand-steps-btn:hover {
+  background: #45a049;
+}
+
+.tech-steps-panel {
+  position: fixed;
+  align-items: center; /* 讓子元素在垂直方向上居中對齊 */
+  left: 0;
+  top: 0;
+  width: 600px;
+  height: 100vh;
+  background: #fff8e1;
+  border-right: 2px solid #ddd;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  z-index: 1000;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+}
+
+.tech-steps-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  background: #f8f9fa;
+  font-size: 30px;
+}
+
+.close-steps-btn {
+  background: none;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+  width: 30px;
+  height: 15px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tech-steps-list {
+  padding: 0px;
+  font-size: 25px;
+}
+
+/* 技術支援步驟列表中的單個步驟項目 */
+.tech-step {
+  display: flex; /* 啟用 Flexbox */
+  align-items: flex-start; /* 讓所有內容從上方對齊，而不是居中 */
+  margin-bottom: 2px;
+  padding: 5px;
+}
+
+/* 步驟勾選框容器：確保勾選框在最左邊 */
+.tech-step .step-checkbox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0; /* 防止縮小 */
+  margin-right: 15px; /* 與文字內容的間距 */
+  margin-top: 5px; /* 新增：將勾選框稍微向下移動，與標題對齊 */
+}
+
+/* 步驟文字內容容器：確保標題和描述在垂直方向上排列 */
+.tech-step .step-content {
+  display: flex;
+  flex-direction: column; /* 將子元素（h4, p）垂直排列 */
+}
+
+/* 調整 h4 和 p 標籤的間距 */
+.tech-step .step-content h4 {
+  margin: 0;
+  font-size: 1.2em; /* 調整字體大小 */
+}
+
+.tech-step .step-content p {
+  margin: 0;
+  font-size: 0.9em; /* 調整字體大小 */
+  color: #666; /* 調整顏色 */
+}
+
+/* 隱藏原生的 checkbox */
+.tech-step input[type="checkbox"] {
+  /* 讓原生 checkbox 不可見，但仍可被讀屏軟體識別 */
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* 建立自訂的 checkbox 外觀 */
+.tech-step .step-checkbox label::after {
+  content: '';
+  display: inline-block;
+  width: 24px; /* 設定你想要的大小 */
+  height: 24px;
+  border: 2px solid #ccc; /* 邊框顏色 */
+  border-radius: 6px; /* 圓角 */
+  background-color: #f0f0f0;
+  transition: all 0.2s ease-in-out;
+}
+
+/* 選中時的樣式 */
+.tech-step input[type="checkbox"]:checked + label::after {
+  background-color: #28a745; /* 選中時的背景色，綠色 */
+  border-color: #28a745;
+}
+
+/* 在選中時加入勾選圖標 */
+.tech-step input[type="checkbox"]:checked + label::before {
+  content: '✔'; /* 勾選符號 */
+  font-size: 16px;
+  color: white; /* 勾勾顏色 */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* 居中對齊 */
+  pointer-events: none; /* 讓點擊事件穿透到下層的 label */
+}
+
+/* 調整 .step-checkbox 和 .tech-step 的 flexbox 排列 */
+.tech-step .step-checkbox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0; /* 防止縮小 */
+  margin-right: 15px; /* 與文字內容的間距 */
+}
+
+/* 步驟語音按鈕樣式 */
+.step-voice-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px;
+  margin-left: 10px;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.step-voice-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.tech-step {
+  display: flex;
+  align-items: flex-start;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.step-content {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+}
+
+.step-number {
+  background-color: #4a90e2;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.step-details {
+  flex: 1;
+}
+
+.step-details h4 {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+}
+
+.step-details p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
 }

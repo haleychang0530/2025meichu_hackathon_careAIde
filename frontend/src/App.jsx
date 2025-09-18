@@ -11,6 +11,13 @@ export default function App() {
   const [voiceLanguage, setVoiceLanguage] = useState("chinese"); // 語音輸出語言選擇
   const [demoMode, setDemoMode] = useState(false); // Demo 模式開關
   const [isAiThinking, setIsAiThinking] = useState(false); // 新增：AI思考狀態
+  
+  // 新增：技術支援相關狀態
+  const [showTechSteps, setShowTechSteps] = useState(false); // 控制技術步驟列表顯示
+  const [techSteps, setTechSteps] = useState([]); // 儲存技術步驟
+  const [completedSteps, setCompletedSteps] = useState([]); // 儲存已完成的步驟ID
+  const [currentTechMessageId, setCurrentTechMessageId] = useState(null); // 當前技術問題的訊息ID
+  
   const chatContainerRef = useRef(null); // 用於滾動到底部
   const recognitionRef = useRef(null);
   const settingsTimerRef = useRef(null); // 用於儲存設定面板自動關閉的計時器
@@ -53,17 +60,79 @@ export default function App() {
   };
 
   // 渲染訊息內容的組件
-  const MessageContent = ({ text, type }) => {
+  const MessageContent = ({ text, type, messageId, isTechRelated }) => {
     if (type === 'ai') {
       return (
-        <div 
-          dangerouslySetInnerHTML={{ 
-            __html: parseMarkdown(text) 
-          }} 
-        />
+        <div>
+          <div 
+            dangerouslySetInnerHTML={{ 
+              __html: parseMarkdown(text) 
+            }} 
+          />
+          {/* 如果是技術相關問題，顯示展開步驟按鈕 */}
+          {isTechRelated && (
+            <div className="tech-support-prompt">
+              <button 
+                className="expand-steps-btn"
+                onClick={() => toggleTechSteps(messageId)}
+              >
+                {showTechSteps && currentTechMessageId === messageId 
+                  ? '收起解決步驟' 
+                  : '📋 展開解決步驟'
+                }
+              </button>
+            </div>
+          )}
+        </div>
       );
     }
     return <span>{text}</span>;
+  };
+
+  // 新增：切換技術步驟顯示
+  const toggleTechSteps = (messageId) => {
+    if (showTechSteps && currentTechMessageId === messageId) {
+      setShowTechSteps(false);
+      setCurrentTechMessageId(null);
+    } else {
+      setShowTechSteps(true);
+      setCurrentTechMessageId(messageId);
+    }
+  };
+
+  // 新增：播放步驟語音
+  const playStepVoice = (stepText) => {
+    const utterance = new SpeechSynthesisUtterance(stepText);
+    
+    // 根據選擇的語言設定
+    if (voiceLanguage === "chinese") {
+      utterance.lang = "zh-TW"; // 設定語言為繁體中文
+    } else if (voiceLanguage === "taiwanese") {
+      utterance.lang = "zh-TW"; // 暫時使用中文作為替代
+    }
+    
+    speechSynthesis.speak(utterance);
+  };
+
+  // 新增：處理步驟完成
+  const handleStepComplete = (stepId) => {
+    setCompletedSteps(prev => {
+      if (prev.includes(stepId)) {
+        return prev.filter(id => id !== stepId);
+      } else {
+        const newCompleted = [...prev, stepId];
+        // 如果所有步驟都完成了，自動收起列表
+        if (newCompleted.length === techSteps.length && techSteps.length > 0) {
+          setTimeout(() => {
+            setShowTechSteps(false);
+            setCurrentTechMessageId(null);
+            setCompletedSteps([]);
+            setTechSteps([]);
+          }, 1000); // 延遲1秒讓用戶看到完成狀態
+        }
+        return newCompleted;
+      }
+    });
   };
 
   // 滾動到底部的函數
@@ -87,10 +156,19 @@ export default function App() {
     };
   }, []);
 
+  // 測試用的技術步驟數據
+  const getTestTechSteps = () => [
+    { id: 1, title: "檢查電源連接", description: "確認設備已正確連接電源" },
+    { id: 2, title: "重新啟動設備", description: "長按電源鍵重新啟動" },
+    { id: 3, title: "檢查網路連線", description: "確認WiFi或網路線連接正常" },
+    { id: 4, title: "更新軟體", description: "檢查並安裝最新的軟體更新" },
+    { id: 5, title: "聯繫技術支援", description: "如問題持續，請聯繫客服人員" }
+  ];
+
   // 測試用的 Markdown 回覆
   const getTestMarkdownReply = (userMessage) => {
     const testReplies = [
-      `這是一個包含 **粗體文字** 和 *斜體文字1abc* 的回覆。
+      `這是一個包含 **粗體文字** 和 *斜體文字* 的回覆。
 
 # 主標題
 ## 副標題
@@ -152,11 +230,39 @@ sudo systemctl restart service
       setShowLogo(false);
     }
 
+    const messageId = Date.now(); // 簡單的ID生成
+    
     // 加入使用者訊息
-    setMessages((prev) => [...prev, { type: "user", text }]);
+    setMessages((prev) => [...prev, { type: "user", text, id: messageId }]);
 
     // AI思考狀態
     setIsAiThinking(true);
+
+    // 測試模式：如果輸入包含特定關鍵字，模擬技術問題回覆
+    const isTechQuestion = text.toLowerCase().includes('電腦') || 
+                          text.toLowerCase().includes('網路') || 
+                          text.toLowerCase().includes('手機') ||
+                          text.toLowerCase().includes('問題') ||
+                          text.toLowerCase().includes('故障') ||
+                          text.includes('技術');
+
+    if (isTechQuestion) {
+      setTimeout(() => {
+        setIsAiThinking(false);
+        const aiMessageId = Date.now() + 1;
+        setMessages((prev) => [...prev, { 
+          type: "ai", 
+          text: "我了解您遇到了技術問題。讓我為您提供一些解決步驟，您可以按照順序嘗試。",
+          id: aiMessageId,
+          isTechRelated: true
+        }]);
+        // 設置技術步驟
+        setTechSteps(getTestTechSteps());
+        setCompletedSteps([]);
+        setCurrentTechMessageId(aiMessageId);
+      }, 1500);
+      return;
+    }
 
     // 測試模式：如果輸入包含 "markdown" 或 "測試"，回傳測試 markdown
     if (text.toLowerCase().includes('markdown') || text.includes('測試')) {
@@ -164,13 +270,14 @@ sudo systemctl restart service
         setIsAiThinking(false);
         setMessages((prev) => [...prev, { 
           type: "ai", 
-          text: getTestMarkdownReply(text)
+          text: getTestMarkdownReply(text),
+          id: Date.now() + 1
         }]);
       }, 1500); // 模擬思考時間
       return;
     }
 
-    // 呼叫假後端
+    // 呼叫後端API
     try {
       const response = await fetch("http://localhost:5000/ai", {
         method: "POST",
@@ -181,13 +288,36 @@ sudo systemctl restart service
       
       // 結束AI思考狀態並加入AI回覆
       setIsAiThinking(false);
-      setMessages((prev) => [...prev, { type: "ai", text: data.reply }]);
+      const aiMessageId = Date.now() + 1;
+      
+      // 檢查是否是技術相關問題
+      let isTechRelated = false;
+      let techStepsData = [];
+      
+      // 如果後端返回了技術步驟信息
+      if (data.class === 1) {
+        isTechRelated = true;
+        // 這裡你可以從後端API獲取步驟數據
+        // techStepsData = data.steps || getTestTechSteps();
+        techStepsData = getTestTechSteps(); // 暫時使用測試數據
+        setTechSteps(techStepsData);
+        setCompletedSteps([]);
+        setCurrentTechMessageId(aiMessageId);
+      }
+      
+      setMessages((prev) => [...prev, { 
+        type: "ai", 
+        text: data.reply,
+        id: aiMessageId,
+        isTechRelated: isTechRelated
+      }]);
+      
     } catch (err) {
       // 發生錯誤時也要結束思考狀態
       setIsAiThinking(false);
       setMessages((prev) => [
         ...prev,
-        { type: "ai", text: "抱歉，我暫時無法回覆 😢" },
+        { type: "ai", text: "抱歉，我暫時無法回覆 😢", id: Date.now() + 1 },
       ]);
     }
   };
@@ -401,6 +531,59 @@ sudo systemctl restart service
         </div>
       )}
 
+      {/* 技術支援步驟面板 */}
+      {showTechSteps && (
+        <div className="tech-steps-panel">
+          <div className="tech-steps-header">
+            <h3>🔧 解決步驟</h3>
+            <button 
+              className="close-steps-btn"
+              onClick={() => setShowTechSteps(false)}
+            >
+              ✕
+            </button>
+          </div>
+          <div className="tech-steps-list">
+            {techSteps.map((step, index) => (
+              <div 
+                key={step.id} 
+                className={`tech-step ${completedSteps.includes(step.id) ? 'completed' : ''}`}
+              >
+                <div className="step-checkbox">
+                  <input
+                    type="checkbox"
+                    id={`step-${step.id}`}
+                    checked={completedSteps.includes(step.id)}
+                    onChange={() => handleStepComplete(step.id)}
+                  />
+                  <label htmlFor={`step-${step.id}`}></label>
+                </div>
+                <div className="step-content">
+                  <div className="step-number">{index + 1}</div>
+                  <div className="step-details">
+                    <h4>{step.title}</h4>
+                    <p>{step.description}</p>
+                  </div>
+                </div>
+                {/* 新增：步驟語音播放按鈕 */}
+                <button
+                  className="step-voice-btn"
+                  onClick={() => playStepVoice(`${step.title}。${step.description}`)}
+                  title="播放步驟說明"
+                >
+                  🔊
+                </button>
+              </div>
+            ))}
+          </div>
+          {completedSteps.length === techSteps.length && techSteps.length > 0 && (
+            <div className="completion-message">
+              🎉 所有步驟已完成！列表將自動收起...
+            </div>
+          )}
+        </div>
+      )}
+
       {/* CareAIde Logo */}
       <div className={`logo-container ${!showLogo ? "fade-out" : ""}`}>
         <h1>
@@ -423,7 +606,12 @@ sudo systemctl restart service
             className={`message-row ${msg.type === "user" ? "right" : "left"}`}
           >
             <div className={`message-bubble ${msg.type}`}>
-              <MessageContent text={msg.text} type={msg.type} />
+              <MessageContent 
+                text={msg.text} 
+                type={msg.type} 
+                messageId={msg.id}
+                isTechRelated={msg.isTechRelated}
+              />
               {msg.type === "ai" && (
                 <div className="voice-buttons">
                   <button
