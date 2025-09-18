@@ -90,7 +90,7 @@ export default function App() {
   // 測試用的 Markdown 回覆
   const getTestMarkdownReply = (userMessage) => {
     const testReplies = [
-      `這是一個包含 **粗體文字** 和 *斜體文字* 的回覆。
+      `這是一個包含 **粗體文字** 和 *斜體文字1abc* 的回覆。
 
 # 主標題
 ## 副標題
@@ -159,7 +159,7 @@ sudo systemctl restart service
     setIsAiThinking(true);
 
     // 測試模式：如果輸入包含 "markdown" 或 "測試"，回傳測試 markdown
-    if (demoMode || text.toLowerCase().includes('markdown') || text.includes('測試')) {
+    if (text.toLowerCase().includes('markdown') || text.includes('測試')) {
       setTimeout(() => {
         setIsAiThinking(false);
         setMessages((prev) => [...prev, { 
@@ -250,21 +250,48 @@ sudo systemctl restart service
     speechSynthesis.cancel(); // 停止語音播放
   };
 
-  const handleEmailSubmit = () => {
+  const handleEmailSubmit = async () => {
     if (!email.trim()) {
       alert("請輸入有效的 Gmail 地址");
       return;
     }
     
-    // Demo 模式下的報告發送
-    if (demoMode) {
-      alert(`🎬 Demo 模式：技術支援報告已模擬發送至 ${email}\n\n功能展示完成！`);
-      console.log("Demo 模式 - 模擬發送報告到:", email);
-      console.log("對話內容:", messages);
-    } else {
-      // 一般模式
-      alert(`模擬發送內容到 Gmail: ${email}\n\n對話內容已準備發送！`);
-      console.log("準備發送的對話內容:", messages);
+    try {
+      if (demoMode) {
+        // Demo 模式：調用 /send_email 接口
+        const response = await fetch("http://localhost:5000/send_email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email }),
+        });
+        const data = await response.json();
+        
+        if (data.status === "success") {
+          alert(`🎬 Demo 模式：已成功發送至 ${email}\n\n功能展示完成！`);
+        } else {
+          alert("發送失敗，請稍後再試");
+        }
+        console.log("Demo 模式 - 發送報告到:", email);
+        console.log("對話內容:", messages);
+      } else {
+        // 一般模式：調用 /change_email_address 接口
+        const response = await fetch("http://localhost:5000/change_email_address", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ new_email: email }),
+        });
+        const data = await response.json();
+        
+        if (data.status === "success") {
+          alert(`Email 地址已成功更新為: ${email}`);
+        } else {
+          alert("更新失敗，請稍後再試");
+        }
+        console.log("更新 Email 地址:", email);
+      }
+    } catch (error) {
+      console.error("API 調用失敗:", error);
+      alert("網路錯誤，請檢查連線後再試");
     }
   };
 
