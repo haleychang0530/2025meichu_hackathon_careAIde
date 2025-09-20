@@ -266,93 +266,82 @@ sudo systemctl restart service
 
   const handleSend = async (text, isTechStepRequest = false, stepIndex = null) => {
     if (!text.trim()) return;
-
+  
     if (isLocalDemo) {
       handleDemoSend(text, isTechStepRequest, stepIndex);
       return;
     }
-
+  
     if (messages.length === 0) {
       setShowLogo(false);
     }
-
+  
     const messageId = Date.now();
     const userMessageText = isTechStepRequest ? `關於第 ${stepIndex + 1} 步：${text}` : text;
     setMessages((prev) => [...prev, { type: "user", text: userMessageText, id: messageId }]);
-
+  
     setIsAiThinking(true);
-
+  
     try {
-    // ... (API 請求和接收的部分保持不變)
-    const apiUrl = isTechStepRequest ? "http://localhost:5000/tech-ai" : "http://localhost:5000/ai";
-    const requestBody = isTechStepRequest ?
-    { step_index: stepIndex, question: text } :
-    { message: text };
-
-    const response = await fetch(apiUrl, {
+      const apiUrl = isTechStepRequest ? "http://localhost:5000/tech-ai" : "http://localhost:5000/ai";
+      const requestBody = isTechStepRequest ?
+        { step_index: stepIndex, question: text } :
+        { message: text };
+  
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
-    });
-
-    const data = await response.json();
-    console.log("後端回傳的原始數據", data);
-
-    setIsAiThinking(false);
-    const aiMessageId = Date.now() + 1;
-
-    // --- 第一步：判斷並解析資料 ---
-    let parsedData = data;
-    try {
-        // 嘗試將後端回傳的 data.reply 欄位進行 JSON 解析
-        // 如果成功，表示它是一個 JSON 字串，我們就用這個解析後的物件
-        parsedData = JSON.parse(data.reply);
-    } catch (e) {
-        // 如果解析失敗，代表 data.reply 只是一般文字，我們就保持原狀
-        // 什麼都不做，parsedData 仍會是原本的 data 物件
-    }
-
-    // --- 第二步：從解析後的資料提取內容 ---
-    // 現在我們使用 parsedData 來提取資訊，因為它可能是原本的 data，
-    // 也可能是新解析出來的 JSON 物件
-    let isTechRelated = parsedData.class === "1" || parsedData.is_tech_related === true;
-    let replyText = parsedData.reply;
-
-    // 更新 AI 訊息，顯示文字回覆
-    setMessages((prev) => [...prev, {
+      });
+  
+      const data = await response.json();
+      console.log("後端回傳的原始數據", data);
+  
+      setIsAiThinking(false);
+      const aiMessageId = Date.now() + 1;
+  
+      // --- 修正後的資料處理邏輯：根據 data.class 判斷 ---
+      const isTechRelated = data.class === "1";
+      let replyText = "";
+      let techStepsData = [];
+  
+      if (isTechRelated) {
+        // 技術問題：'reply' 欄位是物件，需要額外處理
+        replyText = "我了解您遇到了技術問題。請依照以下步驟操作：";
+        techStepsData = Object.entries(data.reply || {}).map(([key, value]) => ({
+          id: parseInt(key, 10),
+          description: value,
+        }));
+      } else {
+        // 非技術問題：'reply' 欄位是字串
+        replyText = data.reply;
+      }
+  
+      // 1. 先顯示文字回覆
+      setMessages((prev) => [...prev, {
         type: "ai",
         text: replyText,
         id: aiMessageId,
         isTechRelated: isTechRelated
-    }]);
-
-    // 如果是技術問題，接著處理並顯示步驟面板
-    if (isTechRelated) {
-        // 從解析後的資料中，取出 tech_steps 物件並轉換成陣列
-        const techStepsData = Object.entries(parsedData.tech_steps || {}).map(([key, value]) => ({
-        id: parseInt(key, 10),
-        // 這裡非常重要！後端回傳的每個步驟物件都有 title 和 description
-        // 所以我們要正確地把它們取出來
-        title: value.title,
-        description: value.description,
-        }));
-    
+      }]);
+  
+      // 2. 如果是技術問題，再顯示步驟面板
+      if (isTechRelated && techStepsData.length > 0) {
         setTechSteps(techStepsData);
         setCompletedSteps([]);
         setCurrentTechMessageId(aiMessageId);
-    
-        if (techStepsData.length > 0) {
         setShowTechSteps(true);
-        }
-    }
+      }
+  
     } catch (err) {
-        setIsAiThinking(false);
-        setMessages((prev) => [
-          ...prev,
-          { type: "ai", text: "抱歉，我暫時無法回覆 😢", id: Date.now() + 1 },
-        ]);
+      console.error("API 請求或處理失敗:", err);
+      setIsAiThinking(false);
+      setMessages((prev) => [
+        ...prev,
+        { type: "ai", text: "抱歉，我暫時無法回覆 😢", id: Date.now() + 1 },
+      ]);
     }
-    };
+  };
 
   const handleVoiceInput = () => {
     if (!("webkitSpeechRecognition" in window)) {
