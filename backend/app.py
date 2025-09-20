@@ -10,7 +10,7 @@ import glob
 import faiss
 import numpy as np
 import pickle
-from RAG.runRAG import get_embedding, cosine_similarity, search_chunks
+from RAG.runRAG import search_chunks, build_prompt
 
 app = Flask(__name__)
 CORS(app) # 新增：允許跨域
