@@ -11,6 +11,10 @@ import faiss
 import numpy as np
 import pickle
 from RAG.runRAG import search_chunks, build_prompt
+from speech_to_text.TaiwaneseSpeech_to_ChineseText import initial_setting, transform
+import sounddevice as sd
+from scipy.io.wavfile import write
+import threading
 
 app = Flask(__name__)
 CORS(app) # 新增：允許跨域
@@ -23,6 +27,13 @@ target_email = "violetff.ee13@nycu.edu.tw"
 
 # recent tech-question
 recent_question = {}
+
+# golbal variable of recording
+is_recording = False
+recording_thread = None
+samplerate = 44100
+channels = 2
+recorded_frames = []
 
 # finctionality
 # ----------------------------------------------------------------------
@@ -111,6 +122,14 @@ def record_question(question, answer):
 
     except Exception as e:
         print(f"寫入紀錄檔失敗: {e}")
+
+def record_audio():
+    global is_recording, recorded_frames
+    recorded_frames = []
+    with sd.InputStream(samplerate=samplerate, channels=channels, dtype='int16') as stream:
+        while is_recording:
+            data, overflowed = stream.read(1024)
+            recorded_frames.append(data)
         
 # ----------------------------------------------------------------------
 
@@ -120,20 +139,59 @@ def record_question(question, answer):
 # routing
 # ----------------------------------------------------------------------
 
+@app.route("/recording-start", methods=["POST"])
+def recording_start():
+    global is_recording, recording_thread
+    if not is_recording:
+        is_recording = True
+        recording_thread = threading.Thread(target=record_audio)
+        recording_thread.start()
+        return jsonify({"status": "recording started"})
+    else:
+        return jsonify({"status": "already recording"})
+    
+@app.route("/recording-end", methods=["POST"])
+def recording_end():
+    global is_recording, recorded_frames
+    if is_recording:
+        is_recording = False
+        recording_thread.join()
+
+        # 把 frame 合併成一個 numpy array
+        audio_data = np.concatenate(recorded_frames, axis=0)
+        
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+        # 拼出 speech_to_text/output.wav 的完整路徑
+        output_path = os.path.join(BASE_DIR, "speech_to_text", "output.wav")
+        
+        write(output_path, samplerate, audio_data)
+        
+        transform()
+        
+        with open("backend/example.txt", "r", encoding="utf-8") as f:
+            chinese_text = f.read()
+            
+        print(f"Chinese Text: {chinese_text}")
+        
+        return jsonify({"status": "recording stopped", "file": "/backend/speech_to_text/output.wav", "text":chinese_text})
+    else:
+        return jsonify({"status": "not recording"})
+
 @app.route("/tech-ai", methods=["POST"])
 def ask_detail():
     
     data = request.get_json()
-    user_message = data.get("message", "")
-    step = data.get("step", "")
+    user_message = data.get("question", "")
+    step = data.get("step_index", "")
 
     if not user_message:
         return jsonify({"error": "Did not receive user message."}), 400
     
     problem_steps = recent_question["translation_result"]
-    problem_steps = json.load(problem_steps)
+    problem_steps = json.loads(problem_steps)
     
-    step_content = problem_steps[step]
+    step_content = problem_steps[str(step)]
     
     prompt = """有一個AI幫助老人解決生活的科技相關問題，並將步驟分為細項。你是一個輔助角色，幫忙針對使用者有問題的步驟做出回應。你需要用簡單易懂的文字來回應使用者。
     問題背景:
@@ -143,7 +201,7 @@ def ask_detail():
         使用者有問題的步驟:""" + step_content +"""
         使用者新的問題:""" + user_message
     
-    response_json = call_ai(model="gpt-oss-20b-mxfp4-GGUF", user_prompt="", default_prompt=prompt)
+    response_json = call_ai(model="Mistral-7B-v0.3-Instruct-Hybrid", user_prompt="", default_prompt=prompt)
     response = response_json['result']
 
     if response_json['status_code'] == "200":
@@ -291,6 +349,7 @@ def send_email():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-    index = faiss.read_index("kb_index.faiss")
-    with open("kb_text.pkl", "rb") as f:
+    index = faiss.read_index("RAG/kb_index.faiss")
+    initial_setting()
+    with open("RAG/kb_text.pkl", "rb") as f:
         texts = pickle.load(f)

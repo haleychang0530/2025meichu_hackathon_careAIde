@@ -285,7 +285,7 @@ sudo systemctl restart service
     try {
       const apiUrl = isTechStepRequest ? "http://localhost:5000/tech-ai" : "http://localhost:5000/ai";
       const requestBody = isTechStepRequest ?
-        { step_index: stepIndex, question: text } :
+        { step_index: stepIndex+1, question: text } :
         { message: text };
   
       const response = await fetch(apiUrl, {
@@ -343,32 +343,80 @@ sudo systemctl restart service
     }
   };
 
-  const handleVoiceInput = () => {
-    if (!("webkitSpeechRecognition" in window)) {
-      alert("你的瀏覽器不支援語音辨識");
-      return;
-    }
-    if (!recognitionRef.current) {
-      const recognition = new window.webkitSpeechRecognition();
-      recognition.lang = "zh-TW";
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        handleSend(transcript);
-        setListening(false);
-      };
-      recognition.onerror = (event) => {
-        console.error("Speech recognition error:", event.error);
-        setListening(false);
-      };
-      recognitionRef.current = recognition;
-    }
+    const handleVoiceInput = async () => {
+  try {
     if (!listening) {
-      recognitionRef.current.start();
+      // 按下去 -> 開始錄音
+      const response = await fetch("http://localhost:5000/recording-start", {
+        method: "POST",
+      });
+      const data = await response.json();
+      console.log("錄音開始:", data);
       setListening(true);
+    } else {
+      // 再按一次 -> 停止錄音
+      const response = await fetch("http://localhost:5000/recording-end", {
+        method: "POST",
+      });
+      const data = await response.json();
+      console.log("錄音結束:", data);
+      setListening(false);
+
+      // 如果後端有回傳檔案路徑，可在這裡處理
+      if (data.file) {
+        alert(`錄音完成，檔案儲存於: ${data.file}`);
+      }
+
+      // 如果後端有回傳文字，保留前綴「關於步驟 n：」
+      if (data.text) {
+        setInputText(prev => {
+          const stepMatch = prev.match(/^關於步驟 (\d+)：/);
+          if (stepMatch) {
+            // 如果已有步驟前綴，文字接在後面
+            return prev + data.text;
+          } else {
+            // 否則直接放文字
+            return data.text;
+          }
+        }); // <-- 這裡要加上閉合括號
+      }
     }
-  };
+  } catch (err) {
+    console.error("錄音 API 錯誤:", err);
+    setListening(false);
+  }
+};
+
+
+   //const handleVoiceInput = () => {
+
+
+
+    // if (!("webkitSpeechRecognition" in window)) {
+    //   alert("你的瀏覽器不支援語音辨識");
+    //   return;
+    // }
+    // if (!recognitionRef.current) {
+    //   const recognition = new window.webkitSpeechRecognition();
+    //   recognition.lang = "zh-TW";
+    //   recognition.interimResults = false;
+    //   recognition.maxAlternatives = 1;
+    //   recognition.onresult = (event) => {
+    //     const transcript = event.results[0][0].transcript;
+    //     handleSend(transcript);
+    //     setListening(false);
+    //   };
+    //   recognition.onerror = (event) => {
+    //     console.error("Speech recognition error:", event.error);
+    //     setListening(false);
+    //   };
+    //   recognitionRef.current = recognition;
+    // }
+    // if (!listening) {
+    //   recognitionRef.current.start();
+    //   setListening(true);
+    // }
+   //};
 
   const handleInputSend = () => {
     handleSend(inputText);
@@ -695,7 +743,7 @@ sudo systemctl restart service
           className={listening ? "recording" : ""}
           disabled={isAiThinking}
         >
-          開始錄音
+           {listening ? "停止錄音" : "開始錄音"}
         </button>
       </div>
     </div>
