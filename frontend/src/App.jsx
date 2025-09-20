@@ -13,6 +13,7 @@ export default function App() {
   const [voiceLanguage, setVoiceLanguage] = useState("chinese");
   const [demoMode, setDemoMode] = useState(false);
   const [isAiThinking, setIsAiThinking] = useState(false);
+  const [isVoiceProcessing, setIsVoiceProcessing] = useState(false); 
 
   const [showTechSteps, setShowTechSteps] = useState(false);
   const [techSteps, setTechSteps] = useState([]);
@@ -492,7 +493,8 @@ sudo systemctl restart service
     const langCode = voiceLanguage === "taiwanese" ? "nan-TW" : "zh-TW";
     try {
 
-      await fetch("http://localhost:5000/play-voice", {
+        setIsVoiceProcessing(true); 
+        const response = await fetch("http://localhost:5000/play-voice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -501,6 +503,30 @@ sudo systemctl restart service
         }),
       });
       console.log("已向後端發送播放語音請求:", text);
+
+      // 等待後端回覆
+    const data = await response.json();
+    console.log("後端回傳語音處理結果:", data);
+
+    // 收到後端回覆後，結束處理中狀態
+    setIsVoiceProcessing(false); 
+
+    if (data.status === 'success') {
+      console.log("後端已成功處理語音並播放");
+      
+      // 向後端回傳「收到」的確認
+      await fetch("http://localhost:5000/acknowledge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: "語音處理完成已收到",
+        }),
+      });
+      console.log("已向後端回傳收到確認");
+    } else {
+      console.error("語音播放失敗:", data.error);
+    }
+
     } catch (err) {
       console.error("播放語音請求失敗:", err);
     }
@@ -692,22 +718,32 @@ sudo systemctl restart service
                 messageId={msg.id}
                 isTechRelated={msg.isTechRelated}
               />
-              {msg.type === "ai" && (
-                <div className="voice-buttons">
-                  <button
-                    className="play-button"
-                    onClick={() => requestVoicePlayback(msg.text)}
-                  >
-                    🔊 播放
-                  </button>
-                  <button
-                    className="stop-button"
-                    onClick={requestStopPlayback}
-                  >
-                    ⏹停止
-                  </button>
-                </div>
-              )}
+             {msg.type === "ai" && (
+        <div className="voice-buttons">
+            {/* 這裡加入語音處理中的判斷 */}
+            {isVoiceProcessing ? (
+            <div className="processing-indicator">
+                <div className="spinner"></div>
+                <span>語音處理中...</span>
+            </div>
+            ) : (
+            <div> {/* 新增父容器 */}
+                <button
+                className="play-button"
+                onClick={() => requestVoicePlayback(msg.text)}
+                >
+                🔊 播放
+                </button>
+                <button
+                className="stop-button"
+                onClick={requestStopPlayback}
+                >
+                ⏹停止
+                </button>
+            </div>
+            )}
+        </div>
+        )}
             </div>
           </div>
         ))}
