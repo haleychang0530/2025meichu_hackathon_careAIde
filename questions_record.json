@@ -1,0 +1,18 @@
+[
+    {
+        "question": "我要怎麼連接iPhone的Wifi",
+        "answer": "```json\n{\n  \"1\": \"步驟1：先確定您的 iPhone 跟時鐘一樣，都是最新的！打開『設定』，點進『一般』，再點到『軟體更新』，看是不是有新版本。若有，點擊下載並安裝，等它安裝完再繼續。\",\n  \"2\": \"步驟2：找到『設定』，它像個灰灰的齒輪圖標，輕輕一點就能進去。\",\n  \"3\": \"步驟3：在設定畫面中，往下捲滑到『網路與網際網路』（有時叫『網路』），點擊進入。\",\n  \"4\": \"步驟4：在網路設定裡，點擊『Wi‑Fi』，這是連接無線網路的門戶。\",\n  \"5\": \"步驟5：確保 Wi‑Fi 開關已經打開，開關在右邊是綠色，表示已經開啟。\",\n  \"6\": \"步驟6：在 Wi‑Fi 頁面，您會看到附近所有可用的網路，輕觸您想連接的那一個。\",\n  \"7\": \"步驟7：點選網路名稱，輸入密碼，然後按下『連接』即可。\",\n  \"8\": \"步驟8：成功後，螢幕上會出現一個 Wi‑Fi 圖示，信號條也會變得更完整，表示已經連線。\",\n  \"9\": \"步驟9：若仍無法連線，先檢查密碼是否正確，或嘗試重新啟動手機；若問題仍存，請聯繫您的網路供應商尋求協助。\"\n}\n```"
+    },
+    {
+        "question": "我要怎麼連接iPhone的Wifi",
+        "answer": " {\n    \"1\": \"First, ensure your iPhone is updated to the latest iOS system.\",\n    \"2\": \"Next, find the 'Settings' app on your iPhone. It's usually a grey gear icon.\",\n    \"3\": \"Tap on 'Settings' to open it.\",\n    \"4\": \"In the Settings, find 'Network' and tap on it.\",\n    \"5\": \"In the Network, find 'Wi-Fi' and tap to open.\",\n    \"6\": \"Ensure Wi-Fi is turned on in the Wi-Fi settings.\",\n    \"7\": \"Find the Wi-Fi network you want to connect to and tap on it.\",\n    \"8\": \"Enter the Wi-Fi password and tap 'Connect'.\",\n    \"9\": \"If your iPhone successfully connects to the Wi-Fi network, you'll see a signal strength bar.\",\n    \"10\": \"If your iPhone can't connect to the Wi-Fi network, check the Wi-Fi settings for accuracy, or contact your network provider for assistance.\"\n}"
+    },
+    {
+        "question": "我要怎麼連接iPhone 的WIFI?",
+        "answer": " {\n    \"1\": \"First, ensure your iPhone is updated to the latest iOS system.\",\n    \"2\": \"Next, locate the 'Settings' app on your iPhone. It's usually found on the home screen, and it looks like a grey gear.\",\n    \"3\": \"Tap on the 'Settings' app to open it.\",\n    \"4\": \"In the Settings app, find 'Network' and tap on it.\",\n    \"5\": \"In the 'Network' section, tap on 'Wi-Fi'.\",\n    \"6\": \"In the 'Wi-Fi' section, find the name of the Wi-Fi network you want to connect to and tap on it.\",\n    \"7\": \"When a window pops up, enter the Wi-Fi password and tap 'Connect'.\",\n    \"8\": \"If your iPhone successfully connects to the Wi-Fi, you'll see an orange signal bar at the top of the screen.\",\n    \"9\": \"If your Wi-Fi requires you to verify your email address or take other steps to verify your identity, follow the prompts.\",\n    \"10\": \"If you encounter issues, check the Wi-Fi password and settings to ensure they're correct, and confirm that your iPhone and Wi-Fi are on the same network.\"\n}"
+    },
+    {
+        "question": "我要怎麼連接iPhone 的WIFI?",
+        "answer": " {\n\"1\": \"首先，請確保您的 iPhone 已經更新到最新的 iOS 系統。\",\n\"2\": \"接下來，請找到設定，看起來是灰灰的齒輪，按下去。\",\n\"3\": \"進入設置界面後，請找到‘網絡’，然後點擊它。\",\n\"4\": \"在‘網絡’界面中，請找到‘Wi-Fi’，然後點擊它。\",\n\"5\": \"在‘Wi-Fi’界面中，請找到您想要連接的 WIFI 名稱，然後點擊它。\",\n\"6\": \"在出現的視窗中，請輸入 WIFI 密碼，然後點擊“連接”。\",\n\"7\": \"如果您的 iPhone 成功連接到 WIFI，您將會看到一個橘色的信號條，表示您已經成功連接到 WIFI 了。\",\n\"8\": \"如果您的 WIFI 需要您驗證您的電子郵件地址或使用其他方法來驗證您的身份，請遵循提示進行操作。\",\n\"9\": \"如果您遇到問題，請檢查 WIFI 的密碼和設置是否正確，並確保您的 iPhone 和 WIFI 在同一個網絡中。\"\n}"
+    }
+]

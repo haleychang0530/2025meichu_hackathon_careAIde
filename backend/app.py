@@ -17,7 +17,7 @@ RECORD_FILE = "questions_record.json"
 target_email = "violetff.ee13@nycu.edu.tw"
 
 # recent tech-question
-recent_question = "default"
+recent_question = {}
 
 # finctionality
 # ----------------------------------------------------------------------
@@ -68,9 +68,9 @@ def call_ai(model, user_prompt, default_prompt, max_token=1000):
         # 嘗試從回傳資料取出文字
         if "choices" in data and len(data["choices"]) > 0:
             content = data["choices"][0]["message"]["content"]
-            return {"result": str(content)}
+            return {"result": str(content), "status_code":f"{response.status_code}"}
         else:
-            return {"result": "No content in response"}
+            return {"result": "No content in response", "status_code":f"{response.status_code}"}
 
     except Exception as e:
         # 確保無論如何 result 一定存在且是字串
@@ -207,22 +207,22 @@ def chat_with_ai():
         default_prompt_translation = """
         (你是一個老人科技助手，將以下的指引詳細又易讀的指示，讓使用者能跟著步驟解決問題。你也可以用較為有趣易懂的方法作為指引。
         例如：「打開設定」變成「找到設定，看起來是灰灰的齒輪，按下去」
-        生成只含step的文檔, 並以步驟作為指引, 回傳一個JSON格式的回覆。
+        生成只含步驟的文檔, 並以步驟作為指引, 回傳一個以下的回覆。
         範例回應：
         {
-        "id":1 "找到設定，看起來是灰灰的齒輪，按下去"
+        "1": "找到設定，看起來是灰灰的齒輪，按下去"
         "2": "......."
         ......
         })"""
-        translation_result_json = call_ai("gpt-oss-20b-mxfp4-GGUF", instruction_result, default_prompt_translation)
+        translation_result_json = call_ai("Mistral-7B-v0.3-Instruct-Hybrid", instruction_result, default_prompt_translation)
         translation_result = translation_result_json['result']
         
         print("Translation result: \n"+translation_result)
         
         record_question(question=user_message, answer=translation_result)
         
-        recent_question['user_message'] = user_message
-        recent_question['translation_result'] = translation_result
+        recent_question["user_message"] = user_message
+        recent_question["translation_result"] = translation_result
         
         return jsonify({"reply":translation_result, "class":"1"})
         
