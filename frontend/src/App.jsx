@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import "./App.css";
+import greetingChinese from './audio/greeting_ch.mp3';
+import greetingTaiwanese from './audio/greeting_tw.mp3';
 
 export default function App() {
   const [messages, setMessages] = useState([]);
@@ -21,6 +23,8 @@ export default function App() {
   const chatContainerRef = useRef(null);
   const recognitionRef = useRef(null);
   const settingsTimerRef = useRef(null);
+  const audioRef = useRef(null);
+
 
   const parseMarkdown = (text) => {
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -76,16 +80,6 @@ export default function App() {
       setShowTechSteps(true);
       setCurrentTechMessageId(messageId);
     }
-  };
-
-  const playStepVoice = (stepText) => {
-    const utterance = new SpeechSynthesisUtterance(stepText);
-    if (voiceLanguage === "chinese") {
-      utterance.lang = "zh-TW";
-    } else if (voiceLanguage === "taiwanese") {
-      utterance.lang = "zh-TW";
-    }
-    speechSynthesis.speak(utterance);
   };
 
   const handleStepComplete = (stepId) => {
@@ -344,6 +338,7 @@ sudo systemctl restart service
   };
 
     const handleVoiceInput = async () => {
+        const langCode = voiceLanguage === "taiwanese" ? "nan-TW" : "zh-TW";
   try {
     if (!listening) {
       // 按下去 -> 開始錄音
@@ -357,6 +352,10 @@ sudo systemctl restart service
       // 再按一次 -> 停止錄音
       const response = await fetch("http://localhost:5000/recording-end", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            language: langCode
+        })        
       });
       const data = await response.json();
       console.log("錄音結束:", data);
@@ -389,9 +388,6 @@ sudo systemctl restart service
 
 
    //const handleVoiceInput = () => {
-
-
-
     // if (!("webkitSpeechRecognition" in window)) {
     //   alert("你的瀏覽器不支援語音辨識");
     //   return;
@@ -421,21 +417,6 @@ sudo systemctl restart service
   const handleInputSend = () => {
     handleSend(inputText);
     setInputText("");
-  };
-
-  const playVoice = (text) => {
-    const cleanText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    if (voiceLanguage === "chinese") {
-      utterance.lang = "zh-TW";
-    } else if (voiceLanguage === "taiwanese") {
-      utterance.lang = "zh-TW";
-    }
-    speechSynthesis.speak(utterance);
-  };
-
-  const stopVoice = () => {
-    speechSynthesis.cancel();
   };
 
   const handleEmailSubmit = async () => {
@@ -502,6 +483,49 @@ sudo systemctl restart service
     } else {
       setShowSettings(true);
       resetAutoCloseTimer();
+    }
+  };
+
+  const requestVoicePlayback = async (text) => {
+    if (!text || !text.trim()) return;
+  
+    const langCode = voiceLanguage === "taiwanese" ? "nan-TW" : "zh-TW";
+    try {
+
+      await fetch("http://localhost:5000/play-voice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: text,
+          language: langCode
+        }),
+      });
+      console.log("已向後端發送播放語音請求:", text);
+    } catch (err) {
+      console.error("播放語音請求失敗:", err);
+    }
+  };
+
+  const playStaticGreeting = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  
+    const audio = new Audio(voiceLanguage === "chinese" ? greetingChinese : greetingTaiwanese);
+    audioRef.current = audio;
+    audio.play().catch((err) => console.error("播放音檔失敗:", err));
+  };
+
+  const requestStopPlayback = async () => {
+    try {
+      await fetch("http://localhost:5000/stop-voice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      console.log("已向後端發送停止播放請求");
+    } catch (err) {
+      console.error("停止播放請求失敗:", err);
     }
   };
 
@@ -617,7 +641,7 @@ sudo systemctl restart service
                 </div>
                 <button
                   className="step-voice-btn"
-                  onClick={() => playStepVoice(`${step.description}`)}
+                  onClick={() => requestVoicePlayback(step.description)}
                 >
                   🔊
                 </button>
@@ -650,7 +674,7 @@ sudo systemctl restart service
           <div className="message-bubble ai">
             你好，我是你的科技助手 😊
             <div className="voice-buttons">
-              <button className="play-button" onClick={() => playVoice('你好，我是你的技術助手')}>
+              <button className="play-button" onClick={playStaticGreeting}>
                 🔊 播放
               </button>
             </div>
@@ -672,13 +696,13 @@ sudo systemctl restart service
                 <div className="voice-buttons">
                   <button
                     className="play-button"
-                    onClick={() => playVoice(msg.text)}
+                    onClick={() => requestVoicePlayback(msg.text)}
                   >
                     🔊 播放
                   </button>
                   <button
                     className="stop-button"
-                    onClick={stopVoice}
+                    onClick={requestStopPlayback}
                   >
                     ⏹停止
                   </button>
