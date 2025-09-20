@@ -339,10 +339,13 @@ sudo systemctl restart service
   };
 
     const handleVoiceInput = async () => {
+        const currentListeningState = listening
         const langCode = voiceLanguage === "taiwanese" ? "nan-TW" : "zh-TW";
+
   try {
-    if (!listening) {
+    if (!currentListeningState) {
       // 按下去 -> 開始錄音
+      console.log("開始錄音 當前狀態:", listening);
       const response = await fetch("http://localhost:5000/recording-start", {
         method: "POST",
       });
@@ -351,6 +354,7 @@ sudo systemctl restart service
       setListening(true);
     } else {
       // 再按一次 -> 停止錄音
+      console.log("停止錄音 當前狀態:", listening)
       const response = await fetch("http://localhost:5000/recording-end", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

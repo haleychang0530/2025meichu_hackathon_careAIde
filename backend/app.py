@@ -11,10 +11,12 @@ import faiss
 import numpy as np
 import pickle
 from RAG.runRAG import search_chunks, build_prompt
+from RAG.joke_runRAG import jk_search_chunks, jk_build_prompt
 from speech_to_text.TaiwaneseSpeech_to_ChineseText import initial_setting, transform
 import sounddevice as sd
 from scipy.io.wavfile import write
 import threading
+from text_to_speech.to_chinese import to_ch_gen_mp3, to_ch_play, to_ch_end
 
 app = Flask(__name__)
 CORS(app) # 新增：允許跨域
@@ -34,6 +36,33 @@ recording_thread = None
 samplerate = 44100
 channels = 2
 recorded_frames = []
+
+index = faiss.IndexFlatL2(768)
+texts = []
+
+jk_index = faiss.IndexFlat(768)
+jk_texts = []
+
+base_dir = os.path.dirname(__file__)   # 取得 app.py 所在資料夾
+index_path = os.path.join(base_dir, "RAG", "kb_index.faiss")
+text_path = os.path.join(base_dir, "RAG", "kb_text.pkl")
+
+jk_index_path = os.path.join(base_dir, "RAG", "jk_kb_index.faiss")
+jk_text_path = os.path.join(base_dir, "RAG", "jk_kb_text.pkl")
+
+index = faiss.read_index(index_path)
+initial_setting()
+with open(text_path, "rb") as f:
+    texts = pickle.load(f)
+    
+jk_index = faiss.read_index(jk_index_path)
+with open(jk_text_path, "rb") as f:
+    jk_texts = pickle.load(f)
+
+# #RAG setup
+# index = faiss.read_index("kb_index.faiss")
+# with open("kb_text.pkl", "rb") as f:
+#         texts = pickle.load(f)
 
 # finctionality
 # ----------------------------------------------------------------------
@@ -139,6 +168,30 @@ def record_audio():
 # routing
 # ----------------------------------------------------------------------
 
+@app.route("/play-voice", methods=["POST"])
+def gen_voice():
+    data = request.get_json()
+    language = data.get("language", "")
+    text = data.get("text", "")
+    
+    if language == "zh-TW":
+        to_ch_gen_mp3(text)
+        return jsonify({"status": "success"})
+    elif language == "nan-TW":
+        return jsonify({"status": "error", "error_message":"This functionality has not been finished."})
+    else:
+        return jsonify({"status": "error", "error_message":"Invalid Language"})
+    
+@app.route("/acknowledge", methods=["POST"])
+def play_voice():
+    to_ch_play()
+    return jsonify({"status": "success"})
+
+@app.route("/stop-voice", methods=["POST"])
+def stop_voice():
+    to_ch_end()
+    return jsonify({"status": "success"})
+
 @app.route("/recording-start", methods=["POST"])
 def recording_start():
     global is_recording, recording_thread
@@ -188,7 +241,7 @@ def recording_end():
 
 @app.route("/tech-ai", methods=["POST"])
 def ask_detail():
-    
+    global index, texts, jk_index, jk_texts
     data = request.get_json()
     user_message = data.get("question", "")
     step = data.get("step_index", "")
@@ -220,7 +273,7 @@ def ask_detail():
 
 @app.route("/ai", methods=["POST"])
 def chat_with_ai():
-    
+    global index, texts, jk_index, jk_texts
     data = request.get_json()
     user_message = data.get("message", "")
     print("收到使用者訊息:", user_message)
@@ -263,12 +316,18 @@ def chat_with_ai():
         
         # instruction generate
         # ----------------------------------------------------------------------
+        chunks = search_chunks(index, texts, user_message, topk=3) 
+        print("\n找到相關資料：")
+        for c in chunks:
+            print("-", c[:80], "...")
+        
         default_prompt_instruction = """
         (你是一個給予科技輔助的幫手，幫助用戶解決生活上的科技問題。你需要將解決方法拆分成一個個詳細的小步驟。
         範例回應:
         步驟1: ......
         步驟2: ......)"""
-        instruction_result_json = call_ai("Mistral-7B-v0.3-Instruct-Hybrid", user_message, default_prompt_instruction)
+        prompt = build_prompt(chunks, user_message)
+        instruction_result_json = call_ai("Mistral-7B-v0.3-Instruct-Hybrid", prompt, default_prompt_instruction)
         instruction_result = instruction_result_json['result']
         
         print("Instructions: \n" + instruction_result)
@@ -278,7 +337,7 @@ def chat_with_ai():
         default_prompt_translation = """
         (你是一個老人科技助手，將以下的指引詳細又易讀的指示，讓使用者能跟著步驟解決問題。你也可以用較為有趣易懂的方法作為指引。
         例如：「打開設定」變成「找到設定，看起來是灰灰的齒輪，按下去」
-        生成只含步驟的文檔, 並以步驟作為指引, 回傳一個以下的回覆。
+        生成只含步驟的文檔, 並以步驟作為指引, 回傳一個以下的回覆, 請務必輸出繁體中文。
         範例回應：
         {"1": "找到設定，看起來是灰灰的齒輪，按下去","2": ".......",......})"""
         translation_result_json = call_ai("Mistral-7B-v0.3-Instruct-Hybrid", instruction_result, default_prompt_translation)
@@ -356,8 +415,6 @@ def send_email():
 
 
 if __name__ == "__main__":
+    
     app.run(host="0.0.0.0", port=5000)
-    index = faiss.read_index("RAG/kb_index.faiss")
-    initial_setting()
-    with open("RAG/kb_text.pkl", "rb") as f:
-        texts = pickle.load(f)
+    

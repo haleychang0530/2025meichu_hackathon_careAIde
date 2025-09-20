@@ -20,12 +20,14 @@ def get_embedding(text):
     res.raise_for_status()
     return res.json()["data"][0]["embedding"]
 
-def search_chunks(index, texts, query, topk=3, threshold=0.5):
+def search_chunks(index, texts, query, topk=3, threshold=0.3):
+    
     emb = np.asarray(get_embedding(query), dtype=np.float32).reshape(1, -1)
     # optional: normalize if you expect cosine
     emb = emb / (np.linalg.norm(emb, axis=1, keepdims=True) + 1e-12)
 
     D, I = index.search(emb, topk)
+    
     results = []
     for dist, idx in zip(D[0], I[0]):
         if idx < 0 or idx >= len(texts):
@@ -70,8 +72,12 @@ def chat_with_llm(prompt):
 # ====== 主程式 ======
 if __name__ == "__main__":
     
-    index = faiss.read_index("kb_index.faiss")
-    with open("kb_text.pkl", "rb") as f:
+    base_dir = os.path.dirname(__file__)   # 取得 app.py 所在資料夾
+    index_path = os.path.join(base_dir, "RAG", "kb_index.faiss")
+    text_path = os.path.join(base_dir, "RAG", "kb_text.pkl")
+    
+    index = faiss.read_index(index_path)
+    with open(text_path, "rb") as f:
         texts = pickle.load(f)
 
     while True:

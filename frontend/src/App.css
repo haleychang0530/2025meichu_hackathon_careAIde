@@ -490,6 +490,14 @@ html, body, #root {
   justify-content: center;
 }
 
+.close-steps-btn:hover{
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.close-steps-btn:active{
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
 .tech-steps-list {
   padding: 0px;
   font-size: 25px;
@@ -622,7 +630,7 @@ html, body, #root {
 }
 
 .step-number {
-  background-color: #4a90e2;
+  background-color: #29ab29;
   color: white;
   width: 24px;
   height: 24px;
@@ -631,6 +639,7 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   margin-right: 10px;
+  margin-bottom: 10px;
   font-size: 12px;
   font-weight: bold;
 }
@@ -655,7 +664,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   color: #888;
-  font-size: 14px;
+  font-size: 20px;
 }
 
 /* 沿用或調整思考中的旋轉動畫 */
@@ -663,8 +672,8 @@ html, body, #root {
   border: 2px solid #f3f3f3;
   border-top: 2px solid #555;
   border-radius: 50%;
-  width: 14px;
-  height: 14px;
+  width: 25px;
+  height: 25px;
   animation: spin 1s linear infinite;
   margin-right: 8px;
 }
@@ -674,3 +683,4 @@ html, body, #root {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
