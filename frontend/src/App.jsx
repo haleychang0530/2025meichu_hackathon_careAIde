@@ -309,10 +309,20 @@ sudo systemctl restart service
       }]);
 
       if (isTechRelated) {
-        const techStepsData = data.tech_steps || getTestTechSteps();
-        setTechSteps(techStepsData);
+        // 將 JSON 格式的技術步驟轉換為陣列格式
+        const techStepsData = Object.entries(data.tech_steps || {}).map(([key, value]) => ({
+          id: parseInt(key, 10), // 將鍵轉換為數字作為步驟 ID
+          description: value,    // 使用值作為步驟描述
+        }));
+      
+        setTechSteps(techStepsData); // 更新技術步驟
         setCompletedSteps([]);
         setCurrentTechMessageId(aiMessageId);
+      
+        // 確保技術步驟面板顯示
+        if (techStepsData.length > 0) {
+          setShowTechSteps(true);
+        }
       }
 
     } catch (err) {
@@ -636,19 +646,21 @@ sudo systemctl restart service
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          onKeyPress={(e) => {
+          // 在 onKeyPress 中
+        onKeyPress={(e) => {
             if (e.key === 'Enter') {
-              const techStepQuestionMatch = inputText.match(/^關於步驟 (\d+) \((.*?)\)：/);
-              if (techStepQuestionMatch) {
-                const stepIndex = parseInt(techStepQuestionMatch[1], 10) - 1;
-                const questionText = inputText.substring(techStepQuestionMatch[0].length).trim();
-                handleSend(questionText, true, stepIndex);
-              } else {
-                handleInputSend();
-              }
-              setInputText("");
+                // 將這裡的正規表達式修改為與 onClick 相同
+                const techStepQuestionMatch = inputText.match(/^關於步驟 (\d+)：/);
+                if (techStepQuestionMatch) {
+                    const stepIndex = parseInt(techStepQuestionMatch[1], 10) - 1;
+                    const questionText = inputText.substring(techStepQuestionMatch[0].length).trim();
+                    handleSend(questionText, true, stepIndex);
+                } else {
+                    handleInputSend();
+                }
+                setInputText("");
             }
-          }}
+        }}
           placeholder="輸入訊息..."
           className="text-input"
           disabled={isAiThinking}
