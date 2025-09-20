@@ -17,6 +17,7 @@ import sounddevice as sd
 from scipy.io.wavfile import write
 import threading
 from text_to_speech.to_chinese import to_ch_gen_mp3, to_ch_play, to_ch_end
+from text_to_speech.to_taiwanese import to_tw_gen_mp3, to_tw_play, to_tw_end
 
 app = Flask(__name__)
 CORS(app) # 新增：允許跨域
@@ -178,19 +179,36 @@ def gen_voice():
         to_ch_gen_mp3(text)
         return jsonify({"status": "success"})
     elif language == "nan-TW":
-        return jsonify({"status": "error", "error_message":"This functionality has not been finished."})
+        to_tw_gen_mp3(text)
+        return jsonify({"status": "success"})
     else:
         return jsonify({"status": "error", "error_message":"Invalid Language"})
     
 @app.route("/acknowledge", methods=["POST"])
 def play_voice():
-    to_ch_play()
-    return jsonify({"status": "success"})
+    data = request.get_json()
+    language = data.get("language", "")
+    if language == "zh-TW":
+        to_ch_play()
+        return jsonify({"status": "success"})
+    elif language == "nan-TW":
+        to_tw_play()
+        return jsonify({"status": "success"})
+    else:
+        return jsonify({"status": "error", "error_message":"Invalid Language"})
 
 @app.route("/stop-voice", methods=["POST"])
 def stop_voice():
-    to_ch_end()
-    return jsonify({"status": "success"})
+    data = request.get_json()
+    language = data.get("language", "")
+    if language == "zh-TW":
+        to_ch_end()
+        return jsonify({"status": "success"})
+    elif language == "nan-TW":
+        to_tw_end()
+        return jsonify({"status": "success"})
+    else:
+        return jsonify({"status": "error", "error_message":"Invalid Language"})
 
 @app.route("/recording-start", methods=["POST"])
 def recording_start():

@@ -524,6 +524,7 @@ sudo systemctl restart service
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: "語音處理完成已收到",
+          language: langCode
         }),
       });
       console.log("已向後端回傳收到確認");
@@ -548,10 +549,14 @@ sudo systemctl restart service
   };
 
   const requestStopPlayback = async () => {
+    const langCode = voiceLanguage === "taiwanese" ? "nan-TW" : "zh-TW";
     try {
       await fetch("http://localhost:5000/stop-voice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          language: langCode
+        }),
       });
       console.log("已向後端發送停止播放請求");
     } catch (err) {
