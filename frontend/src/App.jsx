@@ -355,13 +355,8 @@ sudo systemctl restart service
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-<<<<<<< HEAD
-            language: voiceLanguage === "chinese" ? "zh-TW" : "nan-TW", // 根據選擇設定語言:nan-tw是台語, zh-tw
-        })
-=======
             language: langCode
         })        
->>>>>>> 8db131613c44cd57c2a844b683e8eac2582afa51
       });
       const data = await response.json();
       console.log("錄音結束:", data);
