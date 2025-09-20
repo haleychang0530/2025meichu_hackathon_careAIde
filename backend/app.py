@@ -74,7 +74,7 @@ def call_ai(model, user_prompt, default_prompt, max_token=1000):
 
     except Exception as e:
         # 確保無論如何 result 一定存在且是字串
-        return {"result": f"Error: {str(e)}"}
+        return {"result": "", "status_code":f"{response.status_code}", "error_message": f"Error: {str(e)}"}
 
 def record_question(question, answer):
     """
@@ -121,6 +121,9 @@ def ask_detail():
     data = request.get_json()
     user_message = data.get("message", "")
     step = data.get("step", "")
+
+    if not user_message:
+        return jsonify({"error": "Did not receive user message."}), 400
     
     problem_steps = recent_question["translation_result"]
     problem_steps = json.load(problem_steps)
@@ -137,8 +140,11 @@ def ask_detail():
     
     response_json = call_ai(model="gpt-oss-20b-mxfp4-GGUF", user_prompt="", default_prompt=prompt)
     response = response_json['result']
-    
-    return jsonify({"reply":response, "status":"success"})
+
+    if response_json['status_code'] == "200":
+        return jsonify({"reply":response, "status":"success"})
+    else:
+        return jsonify({"reply": "This is /tech-ai testing."})
     
 
 @app.route("/ai", methods=["POST"])
@@ -163,12 +169,24 @@ def chat_with_ai():
     """
     classify_result_json = call_ai("Mistral-7B-v0.3-Instruct-Hybrid", user_message, default_prompt_classifier, 500)
     classify_result = classify_result_json['result']
+
+    if classify_result_json['status_code'] != "200":
+        classify_result = "2"
     
     print(f"Classify result: "+classify_result)
     
     # condition branch
     # ----------------------------------------------------------------------
-    if "1" in classify_result:
+    if "2" in classify_result:
+    
+    # server off-line, frontend-backend intergration
+
+        reply = """{"1":"打開設定", "2":"點進wifi欄位", "3":"連接Wifi", "4":"聯絡你兒子"}"""
+        class_re = "1"
+        return jsonify({"reply":reply, "class":class_re})
+
+
+    elif "1" in classify_result:
         
     # tech-support problem
         
@@ -255,6 +273,9 @@ def send_email():
     CareAIde"""
     print(result_string)
     ai_response = call_ai("gpt-oss-20b-mxfp4-GGUF", result_string, default_prompt)
+
+    if ai_response['status_code'] != "200":
+        ai_response['result'] = """親愛的先生/女士\n這是一封測試郵件\n祝您有個美好的一天\nCareAIde"""
 
     send_report_email(target_email, "CareAIde Daily Report", ai_response['result'])
 
