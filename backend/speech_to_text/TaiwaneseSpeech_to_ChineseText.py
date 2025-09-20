@@ -18,6 +18,7 @@ from torchaudio.transforms import Resample
 # global varivbles
 
 device = 0
+model_name = ""
 
 def check_tools():
     try:
@@ -188,7 +189,7 @@ class TaiwaneseSTTTTSSystem:
         self.setup_taiwanese_tools()
 
     def setup_stt_model(self):
-        
+        global model_name
         """設定台語轉中文的語音辨識模型"""
         try:
             # 修正模型名稱
@@ -250,7 +251,8 @@ class TaiwaneseSTTTTSSystem:
             self.taiwanese_recognizer = None
             
 
-    def taiwanese_to_chinese_text(self, audio_file_path):
+    def taiwanese_to_chinese_text(self, audio_file_path, mode):
+        global model_name
         try:
             print(f"🎤 開始語音辨識: {audio_file_path}")
             
@@ -261,7 +263,10 @@ class TaiwaneseSTTTTSSystem:
             audio, sample_rate = ensure_16khz_for_whisper(waveform, sample_rate)
             
             print("Whisper 語音處理完成")
-            model_name = "C:/Users\johns\models\whisper"
+            if (mode == "ch"):
+                model_name = 'C:/Users/johns/models/MR_breeze'
+            elif (mode == "tw"):
+                model_name = "C:/Users\johns\models\whisper"
 
             pipe = pipeline("automatic-speech-recognition", model = model_name)
 
@@ -288,12 +293,12 @@ class TaiwaneseSTTTTSSystem:
             print(f"❌ 播放音檔錯誤: {e}")
             print("💡 提示：在WSL中可能需要安裝音頻播放工具")
 
-    def process_taiwanese_audio_pipeline(self, input_audio_file):
+    def process_taiwanese_audio_pipeline(self, input_audio_file, mode):
         """完整的台語音檔處理流程"""
         print("🎙️ 開始處理台語音檔...")
 
         # 步驟1: 台語語音轉中文文字
-        chinese_text = self.taiwanese_to_chinese_text(input_audio_file)
+        chinese_text = self.taiwanese_to_chinese_text(input_audio_file, mode)
         if chinese_text:
             print(f"📝 辨識結果: {chinese_text}")
             return chinese_text
@@ -350,7 +355,7 @@ def load_audio_smart(audio_path, target_sr=16000):
     return waveform, sample_rate
 
 # 使用範例（ROCm優化版）
-def transform():
+def transform(mode):
     # 初始化系統
     print("🚀 正在初始化台語語音轉換系統（ROCm版）...")
     system = TaiwaneseSTTTTSSystem()
@@ -358,7 +363,7 @@ def transform():
     # 範例1: 處理台語音檔
     #input_audio = "C:/Users/johns/taiwanese_voice/cv-corpus-22.0-delta-2025-06-20/nan-tw/clips/common_voice_nan-tw_42722929.mp3"
     input_audio = "C:/Users/johns/Desktop/project/2025meichu_hackathon/backend/speech_to_text/output.wav"
-    chinese_text = system.process_taiwanese_audio_pipeline(input_audio)
+    chinese_text = system.process_taiwanese_audio_pipeline(input_audio, mode)
     
     with open('C:/Users/johns/Desktop/project/2025meichu_hackathon/backend/example.txt', 'w', encoding='utf-8') as file:
         file.write(chinese_text)

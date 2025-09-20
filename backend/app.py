@@ -156,6 +156,9 @@ def recording_end():
     if is_recording:
         is_recording = False
         recording_thread.join()
+        
+        data = request.get_json()
+        language = data.get("language", "")
 
         # 把 frame 合併成一個 numpy array
         audio_data = np.concatenate(recorded_frames, axis=0)
@@ -167,7 +170,12 @@ def recording_end():
         
         write(output_path, samplerate, audio_data)
         
-        transform()
+        if language == "zh-TW":
+            transform("ch")
+        elif language == "nan-TW":
+            transform("tw")
+        else:
+            return jsonify({"status": "error", "error_message":"invalid language"})
         
         with open("backend/example.txt", "r", encoding="utf-8") as f:
             chinese_text = f.read()
