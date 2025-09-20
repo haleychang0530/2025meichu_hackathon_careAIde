@@ -20,21 +20,20 @@ def get_embedding(text):
     res.raise_for_status()
     return res.json()["data"][0]["embedding"]
 
-def cosine_similarity(vec1, vec2):
-    return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
-
 def search_chunks(index, texts, query, topk=3, threshold=0.5):
-    q_emb = np.array([get_embedding(query)]).astype("float32")
-    D, I = index.search(q_emb, topk)
-    
+    emb = np.asarray(get_embedding(query), dtype=np.float32).reshape(1, -1)
+    # optional: normalize if you expect cosine
+    emb = emb / (np.linalg.norm(emb, axis=1, keepdims=True) + 1e-12)
+
+    D, I = index.search(emb, topk)
     results = []
     for dist, idx in zip(D[0], I[0]):
-        # 如果向量已經 normalize，這裡的 dist 就是 2 - 2*cosine
-        # => cosine = 1 - dist/2
+        if idx < 0 or idx >= len(texts):
+            continue
         cos = 1 - dist / 2
+        cos = float(np.clip(cos, -1.0, 1.0))
         if cos >= threshold:
             results.append(texts[idx])
-    
     return results
 
 def build_prompt(chunks, question):

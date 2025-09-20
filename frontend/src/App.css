@@ -649,3 +649,28 @@ html, body, #root {
   font-size: 13px;
   color: #666;
 }
+
+/* 新增語音處理中的容器樣式 */
+.processing-indicator {
+  display: flex;
+  align-items: center;
+  color: #888;
+  font-size: 14px;
+}
+
+/* 沿用或調整思考中的旋轉動畫 */
+.processing-indicator .spinner {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #555;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+/* 保持現有的動畫 */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
