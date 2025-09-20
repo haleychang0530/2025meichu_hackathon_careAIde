@@ -337,7 +337,7 @@ def chat_with_ai():
         default_prompt_translation = """
         (你是一個老人科技助手，將以下的指引詳細又易讀的指示，讓使用者能跟著步驟解決問題。你也可以用較為有趣易懂的方法作為指引。
         例如：「打開設定」變成「找到設定，看起來是灰灰的齒輪，按下去」
-        生成只含步驟的文檔, 並以步驟作為指引, 回傳一個以下的回覆, 請務必輸出繁體中文。
+        生成只含步驟的繁體中文檔, 並以步驟作為指引, 回傳一個以下的回覆。
         範例回應：
         {"1": "找到設定，看起來是灰灰的齒輪，按下去","2": ".......",......})"""
         translation_result_json = call_ai("Mistral-7B-v0.3-Instruct-Hybrid", instruction_result, default_prompt_translation)
@@ -370,7 +370,13 @@ def chat_with_ai():
         
         record_question(question=user_message, answer=chat_result)
         
-        return jsonify({"reply":chat_result, "class":"0"})
+        jk_chunks = jk_search_chunks(jk_index, jk_texts, user_message, topk=1)
+        
+        joke_response = """
+        這裡有一個相關的笑話，希望你會喜歡！
+        """ + jk_chunks[0]
+        
+        return jsonify({"reply":chat_result+joke_response, "class":"0"})
         
     
 @app.route("/change_email_address", methods=["POST"])
