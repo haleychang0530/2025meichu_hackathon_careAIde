@@ -357,6 +357,10 @@ sudo systemctl restart service
       // 再按一次 -> 停止錄音
       const response = await fetch("http://localhost:5000/recording-end", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            language: voiceLanguage === "chinese" ? "zh-TW" : "nan-TW", // 根據選擇設定語言:nan-tw是台語, zh-tw
+        })
       });
       const data = await response.json();
       console.log("錄音結束:", data);
