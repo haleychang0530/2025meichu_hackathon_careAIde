@@ -6,6 +6,11 @@ from flask_cors import CORS # 新增：匯入 CORS 函式庫
 import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
+import glob
+import faiss
+import numpy as np
+import pickle
+from RAG.runRAG import get_embedding, cosine_similarity, search_chunks
 
 app = Flask(__name__)
 CORS(app) # 新增：允許跨域
@@ -209,11 +214,7 @@ def chat_with_ai():
         例如：「打開設定」變成「找到設定，看起來是灰灰的齒輪，按下去」
         生成只含步驟的文檔, 並以步驟作為指引, 回傳一個以下的回覆。
         範例回應：
-        {
-        "1": "找到設定，看起來是灰灰的齒輪，按下去"
-        "2": "......."
-        ......
-        })"""
+        {"1": "找到設定，看起來是灰灰的齒輪，按下去","2": ".......",......})"""
         translation_result_json = call_ai("Mistral-7B-v0.3-Instruct-Hybrid", instruction_result, default_prompt_translation)
         translation_result = translation_result_json['result']
         
@@ -221,8 +222,12 @@ def chat_with_ai():
         
         record_question(question=user_message, answer=translation_result)
         
+        translation_result = translation_result.replace("\n", "").strip()
+        
         recent_question["user_message"] = user_message
         recent_question["translation_result"] = translation_result
+        
+        translation_result = json.loads(translation_result)
         
         return jsonify({"reply":translation_result, "class":"1"})
         
@@ -286,3 +291,6 @@ def send_email():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+    index = faiss.read_index("kb_index.faiss")
+    with open("kb_text.pkl", "rb") as f:
+        texts = pickle.load(f)

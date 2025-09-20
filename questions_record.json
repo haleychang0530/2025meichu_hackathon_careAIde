@@ -14,5 +14,25 @@
     {
         "question": "我要怎麼連接iPhone 的WIFI?",
         "answer": " {\n\"1\": \"首先，請確保您的 iPhone 已經更新到最新的 iOS 系統。\",\n\"2\": \"接下來，請找到設定，看起來是灰灰的齒輪，按下去。\",\n\"3\": \"進入設置界面後，請找到‘網絡’，然後點擊它。\",\n\"4\": \"在‘網絡’界面中，請找到‘Wi-Fi’，然後點擊它。\",\n\"5\": \"在‘Wi-Fi’界面中，請找到您想要連接的 WIFI 名稱，然後點擊它。\",\n\"6\": \"在出現的視窗中，請輸入 WIFI 密碼，然後點擊“連接”。\",\n\"7\": \"如果您的 iPhone 成功連接到 WIFI，您將會看到一個橘色的信號條，表示您已經成功連接到 WIFI 了。\",\n\"8\": \"如果您的 WIFI 需要您驗證您的電子郵件地址或使用其他方法來驗證您的身份，請遵循提示進行操作。\",\n\"9\": \"如果您遇到問題，請檢查 WIFI 的密碼和設置是否正確，並確保您的 iPhone 和 WIFI 在同一個網絡中。\"\n}"
+    },
+    {
+        "question": "要怎麼連接iPHONE的WIFI?",
+        "answer": " {\n\"1\": \"首先，請找到設定，看起來是灰灰的齒輪，按下去。\",\n\"2\": \"接下來，選擇「網絡」，再選擇「Wi-Fi」。\",\n\"3\": \"在 Wi-Fi 設置界面，請確保 Wi-Fi 已經啟用。\",\n\"4\": \"如果未啟用，請滑動右側的滑條移動到「啟用」。\",\n\"5\": \"在 Wi-Fi 設置界面，您可以看到可用的 Wi-Fi 網絡。請選擇您想要連接的 Wi-Fi 網絡。\",\n\"6\": \"在您選擇的 Wi-Fi 網絡下，請輸入密碼。如果密碼是密碼識別碼，請確保在密碼欄位中輸入密碼，在識別碼欄位中輸入識別碼。\",\n\"7\": \"點擊“登錄”或“連接”，等待 iPhone 連接到 Wi-Fi 網絡。\",\n\"8\": \"如果您需要的話，可能需要在您的電腦或路由器上確認 iPhone 的 MAC 地址，以確保 iPhone 能夠連接到 Wi-Fi 網絡。\",\n\"9\": \"如果您遇到問題，請確保您的 Wi-Fi 密碼正確，並確保您的 iPhone 和 Wi-Fi 路由器之間沒有任何物體阻擋。\",\n\"10\": \"如果您仍然遇到問題，請嘗試重新啟動 iPhone 和 Wi-Fi 路由器，然後再試一次。\"\n}"
+    },
+    {
+        "question": "我要怎麼連iPhone的WIFI?",
+        "answer": " {\n    \"1\": \"打開iPhone：解鎖iPhone，然後按下Home鍵（ round 按鍵），讓iPhone進入主畫面。\",\n    \"2\": \"進入設置：在主畫面，滑動到最下方，找到設置（ Settings） App，點擊開啟。\",\n    \"3\": \"進入WiFi設置：在設置 App 中，找到 Wi-Fi 選項，點擊開啟。\",\n    \"4\": \"搜尋WiFi網路：在 Wi-Fi 選項中，iPhone會自動搜尋可用的WiFi網路，請找到您的WiFi網路名稱（ SSID），然後點擊開啟。\",\n    \"5\": \"輸入WiFi密碼：在出現的密碼輸入框中，輸入您的WiFi密碼，然後點擊「連接」。\",\n    \"6\": \"等待連接：iPhone會自動連接到WiFi網路，請等待一些時間，直到出現「連接成功」或「已連接」的提示。\",\n    \"7\": \"檢查連接狀態：在設置 App 中，可以檢查iPhone是否已成功連接到WiFi網路，如果看不到WiFi選項，表示iPhone已成功連接到WiFi網路。\",\n    \"8\": \"檢查網路連接：在主畫面，可以檢查iPhone是否已連接到網路，如果看到三條條狀圖示，表示iPhone已成功連接到網路。\",\n    \"9\": \"檢查連接速度：可以在 Safari 或其他網瀏覽器中，檢查連接速度，如果網站能夠正常載入，表示iPhone已成功連接到網路。\",\n    \"10\": \"搭配其他應用程序：可以在其他應用程序中，檢查是否能夠使用網路功能，如果能夠使用，表示iPhone已成功連接到網路。\"\n}"
+    },
+    {
+        "question": "怎麼連iPhone的WIFI",
+        "answer": " {\n\"1\": \"首先，請找到設定，看起來是灰灰的齒輪，按下去。\",\n\"2\": \"在設定中，選擇「網絡」（Wi-Fi）。\",\n\"3\": \"按下「網絡」選項右上角的「+」按鈕，開始搜尋可用的 WIFI 網路。\",\n\"4\": \"選擇您想要連接的 WIFI 網路，然後輸入網路密碼。\",\n\"5\": \"如果您不知道密碼，請詢問網路提供商或者網路所在的主機人。\",\n\"6\": \"按下「登錄」或「連接」按鈕，等待 iPhone 連接到網路。\",\n\"7\": \"如果您的 iPhone 無法連接到網路，請確保您的 iPhone 和 WIFI 設備之間沒有物理障礙，並且 WIFI 設備已經啟動。\",\n\"8\": \"如果問題 persists，請考慮重新設置 WIFI 設備或聯繫您的網路提供商以獲取更多幫助。\"\n}"
+    },
+    {
+        "question": "怎麼連iphone的WIFI",
+        "answer": " {\n\"1\": \"First, let's find the Settings app. It's a grey gear icon on your iPhone's home screen. Tap on it.\",\n\"2\": \"Next, we're heading to Wi-Fi settings. Scroll down and tap on 'Wi-Fi'.\",\n\"3\": \"Now, let's find a Wi-Fi network. Your iPhone will automatically search for available networks.\",\n\"4\": \"Choose the Wi-Fi network you'd like to connect to from the list.\",\n\"5\": \"Time to enter your Wi-Fi password. Type it in and tap 'Connect'.\",\n\"6\": \"Great! You're now connected to the Wi-Fi network. You'll see a message saying so, along with your IP address.\",\n\"7\": \"Let's check if everything's working. Open Safari or another web browser and try visiting a website. If you can, you're good to go! If not, double-check your Wi-Fi password or contact your network provider for help.\"\n}"
+    },
+    {
+        "question": "我要怎麼連接Iphone的WIFI?",
+        "answer": " {\"1\": \"首先，請找到設定，看起來是灰灰的齒輪，按下去。\",\n\"2\": \"接下來，選擇「網絡」。\",\n\"3\": \"然後，選擇「Wi-Fi」。\",\n\"4\": \"在 Wi-Fi 設置中，您可以看到已連接的 Wi-Fi 網路和可用的 Wi-Fi 網路。\",\n\"5\": \"選擇您想要連接的 Wi-Fi 網路，然後點擊「連接」。\",\n\"6\": \"如果需要，請輸入 Wi-Fi 密碼，然後點擊「連接」。\",\n\"7\": \"最後，等待 iPhone 連接到 Wi-Fi 網路。\",\n\"8\": \"一旦連接成功，您可以在 iPhone 上使用網絡了。\"}"
     }
 ]

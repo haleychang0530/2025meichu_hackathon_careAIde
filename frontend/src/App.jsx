@@ -296,6 +296,7 @@ sudo systemctl restart service
     });
 
     const data = await response.json();
+    console.log("後端回傳的原始數據", data);
 
     setIsAiThinking(false);
     const aiMessageId = Date.now() + 1;
