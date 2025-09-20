@@ -648,7 +648,7 @@ sudo systemctl restart service
       <div className="chat-container" ref={chatContainerRef}>
         <div className="message-row left">
           <div className="message-bubble ai">
-            你好，我是你的技術助手 😊
+            你好，我是你的科技助手 😊
             <div className="voice-buttons">
               <button className="play-button" onClick={() => playVoice('你好，我是你的技術助手')}>
                 🔊 播放
