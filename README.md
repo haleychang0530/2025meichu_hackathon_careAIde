@@ -1,6 +1,9 @@
 ## CareAIde: The Tech-Assistant for the Elderly
 2025 Mei-Chu Hackathon-AMD#04 
 ## Introduction
+
+***CareAIde - Care your mom and dad ~ ***
+
 CareAIde helps the elderly to solve problems relative to technology in their daily life.
 
 The whole project is deployed locally, using lemonade server to run LLM and embedding models.
