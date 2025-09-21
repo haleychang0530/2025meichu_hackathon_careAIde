@@ -6,6 +6,7 @@ html, body, #root {
   height: 100%;
   width: 100%;
   margin: 0;
+  overflow-x: hidden;
   font-family: "Arial", sans-serif;
 }
 
@@ -452,6 +453,7 @@ html, body, #root {
   background: #45a049;
 }
 
+
 .tech-steps-panel {
   position: fixed;
   align-items: center; /* 讓子元素在垂直方向上居中對齊 */
@@ -598,10 +600,11 @@ html, body, #root {
 .step-voice-btn {
   background: none;
   border: none;
-  font-size: 16px;
+  font-size: 26px;
   cursor: pointer;
-  padding: 5px;
+  padding: 7px;
   margin-left: 10px;
+  margin-right: 5px;
   border-radius: 50%;
   width: 30px;
   height: 30px;
@@ -684,3 +687,16 @@ html, body, #root {
   100% { transform: rotate(360deg); }
 }
 
+.ask-ai-btn {
+  background-color: #f0f0f0; /* 淺灰色背景 */
+  border-radius: 5px;
+  padding: 15px 20px;
+  font-size: 18px;
+  cursor: pointer;
+  margin-top: 5px;
+  transition: background-color 0.2s ease;
+}
+
+.ask-ai-btn:hover {
+  background-color: #e0e0e0; /* 滑鼠移過去時變深 */
+}

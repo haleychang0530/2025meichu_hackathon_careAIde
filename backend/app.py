@@ -304,6 +304,8 @@ def chat_with_ai():
     
     default_prompt_classifier = """
     判斷以下文句是否是科技相關問題。例如：「我該怎麼使用藍牙連接滑鼠?」
+    科技相關的問題通常包含但不限於以下詞彙：
+    手機、電腦、平板、網路、藍芽、帳號密碼、註冊等
     如果是科技相關問題，回答"1"
     否則回答"0"。
     你只能回答"1"或"0"
@@ -356,7 +358,7 @@ def chat_with_ai():
         (你是一個老人科技助手，將以下的指引詳細又易讀的指示，讓使用者能跟著步驟解決問題。你也可以用較為有趣易懂的方法作為指引。
         例如：「打開設定」變成「找到設定，看起來是灰灰的齒輪，按下去」
         生成只含步驟的繁體中文檔, 並以步驟作為指引, 回傳一個以下的回覆。
-        範例回應：
+        回應格式應該遵守：
         {"1": "找到設定，看起來是灰灰的齒輪，按下去","2": ".......",......})"""
         translation_result_json = call_ai("Mistral-7B-v0.3-Instruct-Hybrid", instruction_result, default_prompt_translation)
         translation_result = translation_result_json['result']
@@ -370,9 +372,13 @@ def chat_with_ai():
         recent_question["user_message"] = user_message
         recent_question["translation_result"] = translation_result
         
-        translation_result = json.loads(translation_result)
+        try:
+            translation_result = json.loads(translation_result)
+        except Exception as e:
+            return jsonify({"status": "error"})
+            
         
-        return jsonify({"reply":translation_result, "class":"1"})
+        return jsonify({"reply":translation_result, "class":"1", "status": "success"})
         
     else:
         

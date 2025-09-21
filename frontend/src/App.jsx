@@ -20,11 +20,14 @@ export default function App() {
   const [completedSteps, setCompletedSteps] = useState([]);
   const [currentTechMessageId, setCurrentTechMessageId] = useState(null);
   const [isLocalDemo, setIsLocalDemo] = useState(false);
+  const [isRecordingProcessing, setIsRecordingProcessing] = useState(false);
+  const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
 
   const chatContainerRef = useRef(null);
   const recognitionRef = useRef(null);
   const settingsTimerRef = useRef(null);
   const audioRef = useRef(null);
+  
 
 
   const parseMarkdown = (text) => {
@@ -300,14 +303,18 @@ sudo systemctl restart service
       let replyText = "";
       let techStepsData = [];
   
-      if (isTechRelated) {
+      if (isTechRelated && data.status === "success") {
         // 技術問題：'reply' 欄位是物件，需要額外處理
         replyText = "我了解您遇到了技術問題。請依照以下步驟操作：";
         techStepsData = Object.entries(data.reply || {}).map(([key, value]) => ({
           id: parseInt(key, 10),
           description: value,
         }));
-      } else {
+      } 
+      else if (isTechRelated) {
+        replyText = "訊息處理錯誤，請重試。";
+      }
+      else {
         // 非技術問題：'reply' 欄位是字串
         replyText = data.reply;
       }
@@ -321,7 +328,7 @@ sudo systemctl restart service
       }]);
   
       // 2. 如果是技術問題，再顯示步驟面板
-      if (isTechRelated && techStepsData.length > 0) {
+      if (isTechRelated && techStepsData.length > 0 && data.status === "success") {
         setTechSteps(techStepsData);
         setCompletedSteps([]);
         setCurrentTechMessageId(aiMessageId);
@@ -339,56 +346,57 @@ sudo systemctl restart service
   };
 
     const handleVoiceInput = async () => {
-        const currentListeningState = listening
-        const langCode = voiceLanguage === "taiwanese" ? "nan-TW" : "zh-TW";
+    const currentListeningState = listening;
+    const langCode = voiceLanguage === "taiwanese" ? "nan-TW" : "zh-TW";
 
-  try {
-    if (!currentListeningState) {
-      // 按下去 -> 開始錄音
-      console.log("開始錄音 當前狀態:", listening);
-      const response = await fetch("http://localhost:5000/recording-start", {
-        method: "POST",
-      });
-      const data = await response.json();
-      console.log("錄音開始:", data);
-      setListening(true);
-    } else {
-      // 再按一次 -> 停止錄音
-      console.log("停止錄音 當前狀態:", listening)
-      const response = await fetch("http://localhost:5000/recording-end", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            language: langCode
-        })        
-      });
-      const data = await response.json();
-      console.log("錄音結束:", data);
-      setListening(false);
+    try {
+        if (!currentListeningState) {
+            // 按下去 -> 開始錄音
+            console.log("開始錄音 當前狀態:", listening);
+            const response = await fetch("http://localhost:5000/recording-start", {
+                method: "POST",
+            });
+            const data = await response.json();
+            console.log("錄音開始:", data);
+            setListening(true);
+            setIsRecordingProcessing(false); // 確保開始錄音時是 false
+        } else {
+            // 再按一次 -> 停止錄音
+            console.log("停止錄音 當前狀態:", listening);
+            setListening(false);
+            setIsRecordingProcessing(true); // 👈 在發送請求前，立即設為 true
+            
+            const response = await fetch("http://localhost:5000/recording-end", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    language: langCode
+                })
+            });
+            const data = await response.json();
+            console.log("錄音結束:", data);
 
-      // 如果後端有回傳檔案路徑，可在這裡處理
-      if (data.file) {
-        alert(`錄音完成，檔案儲存於: ${data.file}`);
-      }
+            // if (data.file) {
+            //     alert(`錄音完成，檔案儲存於: ${data.file}`);
+            // }
 
-      // 如果後端有回傳文字，保留前綴「關於步驟 n：」
-      if (data.text) {
-        setInputText(prev => {
-          const stepMatch = prev.match(/^關於步驟 (\d+)：/);
-          if (stepMatch) {
-            // 如果已有步驟前綴，文字接在後面
-            return prev + data.text;
-          } else {
-            // 否則直接放文字
-            return data.text;
-          }
-        }); // <-- 這裡要加上閉合括號
-      }
+            if (data.text) {
+                setInputText(prev => {
+                    const stepMatch = prev.match(/^關於步驟 (\d+)：/);
+                    if (stepMatch) {
+                        return prev + data.text;
+                    } else {
+                        return data.text;
+                    }
+                });
+            }
+            setIsRecordingProcessing(false); // 👈 收到後端回覆後，設為 false
+        }
+    } catch (err) {
+        console.error("錄音 API 錯誤:", err);
+        setListening(false);
+        setIsRecordingProcessing(false); // 👈 發生錯誤時也設為 false
     }
-  } catch (err) {
-    console.error("錄音 API 錯誤:", err);
-    setListening(false);
-  }
 };
 
 
@@ -429,6 +437,9 @@ sudo systemctl restart service
       alert("請輸入有效的 Gmail 地址");
       return;
     }
+    // 提交時，立即將狀態設為 true，禁用按鈕
+    setIsSubmittingEmail(true);
+
     try {
       if (demoMode) {
         const response = await fetch("http://localhost:5000/send_email", {
@@ -461,6 +472,10 @@ sudo systemctl restart service
     } catch (error) {
       console.error("API 調用失敗:", error);
       alert("網路錯誤，請檢查連線後再試");
+    }
+      finally {
+      // 無論成功或失敗，都在這裡恢復按鈕
+      setIsSubmittingEmail(false);
     }
   };
 
@@ -613,10 +628,13 @@ sudo systemctl restart service
             <button onClick={() => {
               handleEmailSubmit();
               handlePanelInteraction();
-            }}>
-              {demoMode ? "🎬 模擬發送報告" : "提交"}
-            </button>
-          </div>
+            }}
+              // 在這裡加入 disabled 屬性
+              disabled={isSubmittingEmail}
+              >
+               {isSubmittingEmail ? "發送中..." : (demoMode ? "🎬 模擬發送報告" : "提交")}
+              </button>
+            </div>
           <div className="voice-output">
             <label>語音輸出語言：</label>
             <div className="voice-toggle">
@@ -685,6 +703,9 @@ sudo systemctl restart service
                   onClick={() => {
                     const questionPrefix = `關於步驟 ${index + 1}：`;
                     setInputText(questionPrefix);
+
+                    //關閉側邊攔
+                    setShowTechSteps(false);
                   }}
                 >
                   詢問 AI
@@ -810,9 +831,15 @@ sudo systemctl restart service
         <button
           onClick={handleVoiceInput}
           className={listening ? "recording" : ""}
-          disabled={isAiThinking}
+          disabled={isAiThinking || isRecordingProcessing}
         >
-           {listening ? "停止錄音" : "開始錄音"}
+           {isRecordingProcessing ? (
+            <div className="spinner"></div> // 顯示轉圈圈動畫
+          ) : listening ? (
+            "停止錄音"
+          ) : (
+            "開始錄音"
+          )}
         </button>
       </div>
     </div>
