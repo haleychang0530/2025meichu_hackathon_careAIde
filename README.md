@@ -30,17 +30,17 @@ npm run dev
 python backend/app.py
 ```
 ## Key features
-1. Bilingual speech input and output
+1. Bilingual speech input and output\
    In this project, we support Taiwanese and Chinese speech recognition, plus Chinese and Taiwanese speech synthesis. reducing the need for typing and making interactions more accessible for older users.
  
-2. RAG knowledge base
+2. RAG knowledge base\
    We establish a RAG knowledge base featuring jokes and everyday phrases written in natural, colloquial language, deliverling more precise and easy-to-understand replies.
-3. Run on local
+3. Run on local\
    Running all models on local device, preserving privacy, and delivering efficient and stable performance.
-4. Intuitive interface for elderly
+4. Intuitive interface for elderly\
     We use Larger texts, clear layout and harmonious  colors make the interface easy to use.
-5. Daily user report
+5. Daily user report\
     We send daily user report to user and their carer via Gmail, summarizing the latest status of the elders and making it easier to track well-being.
-6. Auto-detect conversation 
+6. Auto-detect conversation \
     Our model can detect the topic of the query, and adjust the tone and response style accordingly
 
