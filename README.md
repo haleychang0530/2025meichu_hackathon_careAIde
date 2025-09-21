@@ -16,6 +16,8 @@ Chinese to Chinese Speech-to-Text: `MediaTek-Research/Breeze-ASR-25`
 
 Chinese to Chinese Text-to-Speech: `gTTS`
 
+Chinese to Taiwanese Text-to-Speech: `gTTS`
+
 ## Run Project
 run on two terminal
 ### frontend
