@@ -2,7 +2,7 @@
 2025 Mei-Chu Hackathon-AMD#04 
 ## Introduction
 
-** CareAIde - Care your mom and dad ~ **
+** CareAIde: Care your mom and dad **
 
 CareAIde helps the elderly to solve problems relative to technology in their daily life.
 
